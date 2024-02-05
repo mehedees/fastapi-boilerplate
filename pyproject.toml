@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "fastapi-boilerplate"
+version = "0.1.0"
+description = ""
+authors = ["Mehedee Siddique"]
+readme = "README.md"
+packages = [{include = "fastapi_boilerplate"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "~0.109.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
