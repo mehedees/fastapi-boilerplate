@@ -1,4 +1,32 @@
-.venv
-.python-version
-.idea
+# Python
 __pycache__/
+*.py[cod]
+*.so
+.Python
+*.egg-info/
+
+# Environment
+.env
+.env.*
+
+# Development
+.git/
+.gitignore
+README.md
+.pytest_cache/
+tests/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Docker
+Dockerfile*
+.dockerignore
+docker-compose*.yml
+
+# Dependencies (already copied specifically)
+!pyproject.toml
+!uv.lock

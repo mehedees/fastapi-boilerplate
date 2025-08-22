@@ -1,23 +1,66 @@
-FROM python:3.12.1-slim-bookworm
+# Build stage
+FROM python:3.13-slim as builder
 
-ENV PYTHONFAULTHANDLER=1 \
-  PYTHONUNBUFFERED=1 \
-  PYTHONHASHSEED=random \
-  PIP_NO_CACHE_DIR=off \
-  PIP_DEFAULT_TIMEOUT=100 \
-  POETRY_VERSION=1.7 \
-  POETRY_VIRTUALENVS_CREATE=false
+# Set build-time environment variables
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
 
-RUN pip install --upgrade pip && \
-    pip install "poetry==$POETRY_VERSION"
+# Install system dependencies required for building
+RUN apt-get update && apt-get install -y \
+    curl \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /code
+# Install uv
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+ENV PATH="/root/.cargo/bin:$PATH"
 
-COPY poetry.lock pyproject.toml /code/
+# Set work directory
+WORKDIR /app
 
-RUN poetry install --no-interaction
+# Copy dependency files
+COPY pyproject.toml uv.lock ./
 
-COPY . /code
+# Install dependencies system-wide
+RUN uv sync --frozen --no-install-project --system
 
-#EXPOSE 9000
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "9000"]
+# Production stage
+FROM python:3.13-slim as production
+
+# Set production environment variables
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONPATH=/app \
+    FASTAPI_ENV=production \
+    PORT=9000
+
+# Install only runtime system dependencies
+RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+# Create non-root user
+RUN groupadd --gid 1000 appuser \
+    && useradd --uid 1000 --gid appuser --shell /bin/bash --create-home appuser
+
+# Set work directory
+WORKDIR /app
+
+# Copy installed packages from builder stage
+COPY --from=builder /usr/local/lib/python3.13/site-packages /usr/local/lib/python3.13/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
+
+# Copy application code
+COPY --chown=appuser:appuser ./app ./app
+
+# Switch to non-root user
+USER appuser
+
+# Expose port
+EXPOSE 9000
+
+# Command to run the application
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "9000"]
