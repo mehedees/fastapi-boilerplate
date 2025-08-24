@@ -22,18 +22,11 @@ class Settings(BaseSettings):
     DATABASE_NAME: str
     DATABASE_URL: str = ""
 
-    # Security
-    SECRET_KEY: str
-    ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int
 
     # CORS
     ALLOWED_ORIGINS: list[str]
     ALLOWED_METHODS: list[str]
     ALLOWED_HEADERS: list[str]
-
-    # File Storage
-    UPLOAD_DIR: str
 
     model_config = SettingsConfigDict(
         env_file=".env",
