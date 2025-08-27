@@ -20,8 +20,16 @@ class Settings(BaseSettings):
     DATABASE_USER: str
     DATABASE_PASSWORD: str
     DATABASE_NAME: str
-    DATABASE_URL: str = ""
+    DATABASE_POOL_SIZE: int = 5
+    DATABASE_POOL_RECYCLE: int = 14400
+    DATABASE_POOL_TIMEOUT: int = 30
 
+    @property
+    def database_url(self):
+        return (
+            f"mysql+mysqlconnector://{self.DATABASE_USER}:{self.DATABASE_PASSWORD}"
+            f"@{self.DATABASE_HOST}:{self.DATABASE_PORT}/{self.DATABASE_NAME}"
+        )
 
     # CORS
     ALLOWED_ORIGINS: list[str]
