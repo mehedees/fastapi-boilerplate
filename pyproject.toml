@@ -3,7 +3,7 @@ name = "fastapi-boilerplate"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.13.3"
+requires-python = ">=3.13"
 dependencies = [
     "fastapi[standard]>=0.116.1",
     "mysql-connector-python>=9.4.0",

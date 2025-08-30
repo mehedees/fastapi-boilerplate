@@ -1,10 +1,13 @@
+from datetime import datetime
+
 from sqlmodel import Field, SQLModel
 
 
 class User(SQLModel, table=True):
-    username: str = Field(primary_key=True, unique=True)
+    id: int | None = Field(default=None, primary_key=True)
     email: str = Field(unique=True)
-    first_name: str
-    last_name: str
-    middle_name: str | None = None
+    name: str
     password: str
+
+    created_at: datetime | None = Field(default=None, default_factory=datetime.now)
+    updated_at: datetime | None = Field(default=None, default_factory=datetime.now)

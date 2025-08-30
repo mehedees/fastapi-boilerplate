@@ -1,6 +1,6 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request, status
+from fastapi import FastAPI, status
 from sqlalchemy import Engine
 
 from app.core.db import get_engine
@@ -34,5 +34,5 @@ app = FastAPI(
     status_code=status.HTTP_200_OK,
     response_model=APIResponse,
 )
-async def healthcheck(request: Request):
+async def healthcheck():
     return APIResponse()
