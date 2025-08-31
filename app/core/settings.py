@@ -27,7 +27,7 @@ class Settings(BaseSettings):
     @property
     def database_url(self):
         return (
-            f"mysql+mysqlconnector://{self.DATABASE_USER}:{self.DATABASE_PASSWORD}"
+            f"mysql+pymysql://{self.DATABASE_USER}:{self.DATABASE_PASSWORD}"
             f"@{self.DATABASE_HOST}:{self.DATABASE_PORT}/{self.DATABASE_NAME}"
         )
 
@@ -37,9 +37,7 @@ class Settings(BaseSettings):
     ALLOWED_HEADERS: list[str]
 
     model_config = SettingsConfigDict(
-        env_file=".env",
-        env_file_encoding="utf-8",
-        extra='ignore'
+        env_file=".env", env_file_encoding="utf-8", extra="ignore"
     )
 
 

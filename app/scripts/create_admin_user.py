@@ -1,36 +1,37 @@
 from sqlalchemy.exc import MultipleResultsFound, NoResultFound
-from sqlmodel import select
 
 from app.core.base_script import BaseScript
+from app.core.db import managed_db_context
 from app.domain.users.models import User
 
 
 class CreateFirstUser(BaseScript):
-    def create_first_user(self):
-        try:
-            self.session.exec(select(User)).one()
-            print("First user exists already")
+    @staticmethod
+    def create_first_user():
+        with managed_db_context() as db:
+            try:
+                db.query(User).one()
+                print("First user exists already")
+                return
+            except MultipleResultsFound:
+                print("Multiple users found")
+                return
+            except NoResultFound:
+                print("No user found, proceeding to user create")
+
+            email: str = input("Email: ")
+            name: str = input("Name: ")
+            password: str = input("Password: ")
+
+            user = User(
+                email=email,
+                name=name,
+                password=password,
+            )
+
+            print(f"Creating user {user.name}")
+            db.add(user)
             return
-        except MultipleResultsFound:
-            print("Multiple users found")
-            return
-        except NoResultFound:
-            print("No user found, proceeding to user create")
-
-        email: str = input("Email: ")
-        name: str = input("Name: ")
-        password: str = input("Password: ")
-
-        user = User(
-            email=email,
-            name=name,
-            password=password,
-        )
-
-        self.session.add(user)
-        self.session.commit()
-        print(f"Created user {user.name} successfully")
-        return
 
 
 if __name__ == "__main__":

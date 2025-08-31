@@ -1,21 +1,18 @@
-from app.core.db import get_engine, get_session
+from app.core.db import initialize_db, shutdown_db
+from app.core.settings import get_settings
+
+settings = get_settings()
 
 
 class BaseScript:
     def __init__(self):
         print("Initializing Base Script")
-        self.session = None
-        self.engine = None
 
     def __enter__(self):
         print("Entering Base Script")
-        self.engine = get_engine()
-        self.session = get_session()
+        initialize_db(settings)
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         print("Exiting Base Script")
-        self.session.close()
-        self.engine.dispose()
-        self.session = None
-        self.engine = None
+        shutdown_db()

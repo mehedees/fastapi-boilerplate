@@ -1,13 +1,18 @@
 from datetime import datetime
 
-from sqlmodel import Field, SQLModel
+from sqlalchemy import Column, DateTime, Integer, String
+from sqlalchemy.sql import func
+
+from app.core.db import BaseDBModel
 
 
-class User(SQLModel, table=True):
-    id: int | None = Field(default=None, primary_key=True)
-    email: str = Field(unique=True)
-    name: str
-    password: str
+class User(BaseDBModel):
+    __tablename__ = "users"
 
-    created_at: datetime | None = Field(default_factory=datetime.now)
-    updated_at: datetime | None = Field(default_factory=datetime.now)
+    id: int = Column(Integer, primary_key=True, autoincrement=True)
+    email: str = Column(String(100), unique=True, nullable=False)
+    name: str = Column(String(100), nullable=False)
+    password: str = Column(String(100), nullable=False)
+
+    created_at: datetime | None = Column(DateTime, server_default=func.now())
+    updated_at: datetime | None = Column(DateTime, server_default=func.now())
