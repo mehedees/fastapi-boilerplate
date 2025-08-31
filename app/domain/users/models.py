@@ -9,5 +9,5 @@ class User(SQLModel, table=True):
     name: str
     password: str
 
-    created_at: datetime | None = Field(default=None, default_factory=datetime.now)
-    updated_at: datetime | None = Field(default=None, default_factory=datetime.now)
+    created_at: datetime | None = Field(default_factory=datetime.now)
+    updated_at: datetime | None = Field(default_factory=datetime.now)

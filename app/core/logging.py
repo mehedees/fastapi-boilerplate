@@ -37,8 +37,7 @@ class SensitiveDataFilter(logging.Filter):
 def configure_logger():
     logger = logging.getLogger("fastapi_app")
     logger.handlers = []
-    log_level = settings.LOG_LEVEL
-    logger.setLevel(getattr(logging, log_level, logging.INFO))
+    logger.setLevel(getattr(logging, settings.LOG_LEVEL, logging.INFO))
     formatter = json.JsonFormatter(
         fmt="%(asctime)s %(levelname)s %(name)s %(message)s %(extra)s",
         datefmt="%Y-%m-%d %H:%M:%S",

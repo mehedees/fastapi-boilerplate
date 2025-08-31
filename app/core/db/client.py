@@ -3,11 +3,14 @@ from sqlmodel import Session, SQLModel
 from .engine import get_engine
 
 
-# Dependency for FastAPI
 def get_session():
+    """
+    Create a new SQLModel session.
+    MUST CLOSE the session after use.
+    :return: SQLModel Session
+    """
     engine = get_engine()
-    with Session(engine) as session:
-        yield session
+    return Session(engine)
 
 
 # For migrations or app startup

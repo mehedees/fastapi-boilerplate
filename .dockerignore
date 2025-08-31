@@ -30,3 +30,6 @@ docker-compose*.yml
 # Dependencies (already copied specifically)
 !pyproject.toml
 !uv.lock
+
+# Database
+mysql_data/

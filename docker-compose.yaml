@@ -3,16 +3,16 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    env_file: .env
     ports:
-      - "9000:9000"
-    env_file:
-      - .env
+      - "${PORT:-9000}:9000"
     depends_on:
       mysql:
         condition: service_healthy
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "9000", "--workers", "1", "--reload", "--log-level", "info"]
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:9000/health', timeout=5)"]
-      interval: 30s
+      interval: 300s
       timeout: 10s
       retries: 3
       start_period: 40s
@@ -21,20 +21,19 @@ services:
     restart: always
 
   mysql:
-    image: mysql:8.0
+    image: mysql:9.4.0
     ports:
       - "${DATABASE_PORT}:3306"
-    env_file:
-      - .env
+    env_file: .env
     environment:
       MYSQL_RANDOM_ROOT_PASSWORD: "yes"
       MYSQL_DATABASE: ${DATABASE_NAME}
       MYSQL_USER: ${DATABASE_USER}
       MYSQL_PASSWORD: ${DATABASE_PASSWORD}
     volumes:
-      - mysql_data:/var/lib/mysql
+      - ./mysql_data:/var/lib/mysql
     healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "${DATABASE_PASSWORD}", "-p${DATABASE_PASSWORD}" ]
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "${DATABASE_USER}", "-p${DATABASE_PASSWORD}" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -44,8 +43,7 @@ services:
     restart: always
 
 volumes:
-  mysql_data:
-    driver: local
+  mysql_data: {}
 
 networks:
   fastapi_portfolio_network:
