@@ -1,18 +1,23 @@
 from datetime import datetime
 
-from sqlalchemy import Column, DateTime, Integer, String
+from sqlalchemy import DateTime, Integer, String
+from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
 
 from app.core.db import BaseDBModel
 
 
-class User(BaseDBModel):
+class UserModel(BaseDBModel):
     __tablename__ = "users"
 
-    id: int = Column(Integer, primary_key=True, autoincrement=True)
-    email: str = Column(String(100), unique=True, nullable=False)
-    name: str = Column(String(100), nullable=False)
-    password: str = Column(String(100), nullable=False)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    email: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
+    password: Mapped[str] = mapped_column(String, nullable=False)
 
-    created_at: datetime | None = Column(DateTime, server_default=func.now())
-    updated_at: datetime | None = Column(DateTime, server_default=func.now())
+    created_at: Mapped[datetime | None] = mapped_column(
+        DateTime, server_default=func.now()
+    )
+    updated_at: Mapped[datetime | None] = mapped_column(
+        DateTime, server_default=func.now()
+    )

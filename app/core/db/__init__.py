@@ -1,4 +1,5 @@
-from .client import BaseDBModel, get_db, initialize_db, managed_db_context, shutdown_db
+from .client import get_db, initialize_db, managed_db_context, shutdown_db
+from .model import BaseDBModel
 
 __all__ = [
     "initialize_db",

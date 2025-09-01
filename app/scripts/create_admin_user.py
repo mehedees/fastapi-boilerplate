@@ -1,11 +1,11 @@
-from dataclasses import asdict
-
 from sqlalchemy.exc import MultipleResultsFound, NoResultFound
 
 from app.core.base_script import BaseScript
 from app.core.db import managed_db_context
-from app.domain.users.entities import UserCreate
-from app.domain.users.models import User
+from app.domain.users.entities import UserCreateEntity, UserEntity
+from app.domain.users.models import UserModel
+from app.domain.users.services import UserService
+from app.infra.persistence.user_repo import UserRepoImpl
 
 
 class CreateFirstUser(BaseScript):
@@ -13,7 +13,7 @@ class CreateFirstUser(BaseScript):
     def create_first_user():
         with managed_db_context() as db:
             try:
-                db.query(User).one()
+                db.query(UserModel).one()
                 print("First user exists already")
                 return
             except MultipleResultsFound:
@@ -29,12 +29,13 @@ class CreateFirstUser(BaseScript):
             if not email or not name or not password:
                 raise ValueError("Email, name and password are required")
 
-            user_entity = UserCreate(email=email, name=name, password=password)
+            user_entity = UserCreateEntity(email=email, name=name, password=password)
 
-            user = User(**asdict(user_entity))
+            user: UserEntity = UserService().create_user(
+                user_entity, UserRepoImpl(session=db)
+            )
 
-            print(f"Creating user {user.name}")
-            db.add(user)
+            print(f"Created user {user.name}")
             return
 
 

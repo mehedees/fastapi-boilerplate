@@ -3,7 +3,7 @@ from datetime import datetime
 
 
 @dataclass
-class User:
+class UserEntity:
     id: int
     email: str
     name: str
@@ -14,14 +14,14 @@ class User:
 
 
 @dataclass
-class UserCreate:
+class UserCreateEntity:
     email: str
     name: str
     password: str
 
 
 @dataclass
-class UserUpdate:
+class UserUpdateEntity:
     email: str | None = None
     name: str | None = None
     password: str | None = None

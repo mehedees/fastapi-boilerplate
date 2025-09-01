@@ -1,8 +1,12 @@
 from typing import Protocol
 
-from app.domain.users.entities import User
+from sqlalchemy.orm import Session
+
+from app.domain.users.entities import UserCreateEntity, UserEntity
 
 
 class UserRepo(Protocol):
-    async def get_user_by_email(self, email: str) -> User:
-        ...
+    def __init__(self, session: Session):
+        self.session = session
+
+    def create_user(self, user: UserCreateEntity) -> UserEntity: ...

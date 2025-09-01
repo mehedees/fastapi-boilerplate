@@ -2,15 +2,15 @@ from collections.abc import Generator
 from contextlib import contextmanager
 
 from sqlalchemy import Engine, create_engine
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 from app.core.db.utils import initialize_db_tables
 from app.core.settings import Settings
 
+from .model import BaseDBModel
+
 engine: Engine | None = None
 DBSession: sessionmaker | None = None
-BaseDBModel = declarative_base()
 
 
 def _get_engine(settings: Settings) -> Engine:
