@@ -1,7 +1,10 @@
+from dataclasses import asdict
+
 from sqlalchemy.exc import MultipleResultsFound, NoResultFound
 
 from app.core.base_script import BaseScript
 from app.core.db import managed_db_context
+from app.domain.users.entities import UserCreate
 from app.domain.users.models import User
 
 
@@ -23,11 +26,12 @@ class CreateFirstUser(BaseScript):
             name: str = input("Name: ")
             password: str = input("Password: ")
 
-            user = User(
-                email=email,
-                name=name,
-                password=password,
-            )
+            if not email or not name or not password:
+                raise ValueError("Email, name and password are required")
+
+            user_entity = UserCreate(email=email, name=name, password=password)
+
+            user = User(**asdict(user_entity))
 
             print(f"Creating user {user.name}")
             db.add(user)

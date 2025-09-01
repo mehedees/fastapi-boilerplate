@@ -14,6 +14,9 @@ class Settings(BaseSettings):
     LOG_LEVEL: str
     API_V1_PREFIX: str = "/api/v1"
 
+    # Secret Key
+    SECRET_KEY: str
+
     # Database
     DATABASE_HOST: str
     DATABASE_PORT: str
