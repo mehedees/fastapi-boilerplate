@@ -3,7 +3,7 @@ from dataclasses import asdict
 from sqlalchemy.orm import Session
 
 from app.domain.users.entities import UserCreateEntity, UserEntity
-from app.domain.users.models import UserModel
+from app.infra.persistence.models.user import UserModel
 
 
 class UserRepoImpl:

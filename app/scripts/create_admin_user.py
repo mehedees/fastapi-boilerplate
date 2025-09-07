@@ -3,9 +3,9 @@ from sqlalchemy.exc import MultipleResultsFound, NoResultFound
 from app.core.base_script import BaseScript
 from app.core.db import managed_db_context
 from app.domain.users.entities import UserCreateEntity, UserEntity
-from app.domain.users.models import UserModel
 from app.domain.users.services import UserService
-from app.infra.persistence.user_repo import UserRepoImpl
+from app.infra.persistence.models.user import UserModel
+from app.infra.persistence.repo_impl.user import UserRepoImpl
 
 
 class CreateFirstUser(BaseScript):

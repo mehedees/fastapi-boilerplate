@@ -1,4 +1,10 @@
-from .client import get_db, initialize_db, managed_db_context, shutdown_db
+from app.infra.persistence.db import (
+    get_db,
+    initialize_db,
+    managed_db_context,
+    shutdown_db,
+)
+
 from .model import BaseDBModel
 
 __all__ = [
