@@ -1,7 +1,10 @@
+from collections.abc import Generator
+
 from sqlalchemy import Engine, create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session, sessionmaker
 
 from app.core.settings import Settings
+from app.infra.persistence.models.base import BaseDBModel
 
 
 class DB:
@@ -25,7 +28,7 @@ class DB:
             },
         )
 
-    def __get_session_maker(self):
+    def __get_session_maker(self) -> sessionmaker:
         return sessionmaker(
             bind=self.engine,
             autoflush=False,
@@ -33,9 +36,12 @@ class DB:
             expire_on_commit=False,
         )
 
-    def get_session(self):
+    def get_session(self) -> Generator[Session]:
         with self.session_factory() as session:
             yield session
+
+    def initialize_db_tables(self):
+        BaseDBModel.metadata.create_all(bind=self.engine)
 
     def __del__(self):
         self.engine.dispose()
@@ -44,6 +50,7 @@ class DB:
 db: DB | None = None
 
 
-def start_db(settings: Settings):
+def start_db(settings: Settings) -> DB:
     global db
     db = DB(settings)
+    return db

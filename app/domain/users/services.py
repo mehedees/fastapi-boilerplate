@@ -7,13 +7,15 @@ settings = get_settings()
 
 
 class UserService:
-    def create_user(self, user: UserCreateEntity, repo: UserRepo) -> UserEntity:
-        user.password = SecureHashManager(settings.SECRET_KEY).hash_password_argon2(
-            user.password
-        )
+    def __init__(self, repo: UserRepo, hash_manager: SecureHashManager) -> None:
+        self.repo = repo
+        self.hash_manager = hash_manager
+
+    def create_user(self, user: UserCreateEntity) -> UserEntity:
+        user.password = self.hash_manager.hash_password_argon2(user.password)
 
         print("hashed password", user.password)
 
-        new_user: UserEntity = repo.create_user(user)
+        new_user: UserEntity = self.repo.create_user(user)
 
         return new_user

@@ -43,7 +43,7 @@ class DatabaseDependency:
         self.read_only = read_only
         self.session = None
 
-    def __call__(self) -> Generator[Session, None]:
+    def __call__(self) -> Generator[Session]:
         session = database.get_session()
         try:
             yield session

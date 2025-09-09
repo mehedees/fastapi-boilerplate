@@ -2,10 +2,10 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, status
 
-from app.core.db import initialize_db, shutdown_db
+from app.core.container import Container, setup_container
 from app.core.logging import logger
 from app.core.schemas.base import APIResponse
-from app.core.settings import get_settings
+from app.core.settings import Settings, get_settings
 
 settings = get_settings()
 
@@ -13,11 +13,11 @@ settings = get_settings()
 @asynccontextmanager
 async def app_lifespan(app: FastAPI):
     logger.info("Starting app")
-    settings = get_settings()
-    initialize_db(settings)
+    settings: Settings = get_settings()
+    container: Container = setup_container(settings)
+
     yield
     logger.info("Shutting down app")
-    shutdown_db()
 
 
 app = FastAPI(

@@ -1,0 +1,116 @@
+from dependency_injector import containers, providers
+
+from app.core.settings import Settings
+from app.infra.persistence.db import start_db
+
+# # from app.infra.persistence.r.user_repo_impl import UserRepositoryImpl
+
+# # from domain.payments.services import PaymentService
+# # from domain.users.services import UserService
+
+# # from app.infra.persistence.repositories.payment_repo_impl import (
+# #     PaymentRepositoryImpl,
+# # )
+
+
+class Container(containers.DeclarativeContainer):
+    """Dependency injection container."""
+
+    # Configuration
+    config = providers.Configuration()
+
+    # Infrastructure - Database
+    database = providers.Singleton(start_db, settings=config)
+
+
+#     # Repositories
+#     user_repository = providers.Factory(
+#         UserRepositoryImpl,
+#         session_factory=database.provided.session_factory,
+#     )
+
+#     payment_repository = providers.Factory(
+#         PaymentRepositoryImpl,
+#         session_factory=database.provided.session_factory,
+#     )
+
+#     # Domain Services
+#     user_service = providers.Factory(
+#         UserService,
+#         user_repository=user_repository,
+#     )
+
+#     payment_service = providers.Factory(
+#         PaymentService,
+#         payment_repository=payment_repository,
+#     )
+
+
+def setup_container(settings: Settings) -> Container:
+    """
+    Setup and configure the DI container.
+    Call this during application startup.
+    """
+    container = Container()
+    container.config.from_pydantic(settings)
+
+    # Wire modules for automatic injection
+    container.wire(
+        modules=[
+            # "api.v1.users.views",
+            # "api.v1.payments.views",
+            # Add more modules as needed
+        ]
+    )
+
+    return container
+
+
+# # Dependency injection helpers for FastAPI
+# def get_user_service():
+#     """FastAPI dependency for UserService."""
+#     return Provide[Container.user_service]
+
+
+# def get_payment_service():
+#     """FastAPI dependency for PaymentService."""
+#     return Provide[Container.payment_service]
+
+
+# def get_user_repository():
+#     """FastAPI dependency for UserRepository."""
+#     return Provide[Container.user_repository]
+
+
+# def get_payment_repository():
+#     """FastAPI dependency for PaymentRepository."""
+#     return Provide[Container.payment_repository]
+
+
+# # Example of how to use in FastAPI views:
+# """
+# # In api/v1/users/views.py
+
+# from fastapi import Depends
+# from dependency_injector.wiring import inject, Provide
+# from core.container import Container
+# from domain.users.services import UserService
+
+# class UserController:
+#     @inject
+#     def __init__(
+#         self,
+#         user_service: UserService = Depends(Provide[Container.user_service])
+#     ):
+#         self.user_service = user_service
+
+# # Or using the helper functions:
+# from core.container import get_user_service
+
+# @router.post("/users")
+# async def create_user(
+#     user_service: UserService = Depends(get_user_service),
+# ):
+#     # Use user_service
+#     pass
+# """
