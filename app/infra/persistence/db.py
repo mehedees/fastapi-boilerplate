@@ -1,17 +1,24 @@
-from collections.abc import Generator
+from collections.abc import Callable
 
 from sqlalchemy import Engine, create_engine
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.orm import Session, scoped_session, sessionmaker
 
 from app.core.settings import Settings
 from app.infra.persistence.models.base import BaseDBModel
 
 
-class DB:
+class Database:
     def __init__(self, settings: Settings):
         self.settings = settings
         self.engine = self.__create_engine()
-        self.session_factory = self.__get_session_maker()
+        self.__session_factory: Callable[[], Session] = scoped_session(
+            sessionmaker(
+                bind=self.engine,
+                autoflush=False,
+                autocommit=False,
+                expire_on_commit=False,
+            )
+        )
 
     def __create_engine(self) -> Engine:
         return create_engine(
@@ -28,29 +35,35 @@ class DB:
             },
         )
 
-    def __get_session_maker(self) -> sessionmaker:
-        return sessionmaker(
-            bind=self.engine,
-            autoflush=False,
-            autocommit=False,
-            expire_on_commit=False,
-        )
+    def session_factory(self, auto_commit: bool = True, read_only: bool = False):
+        """
+        Provide a transactional scope around a series of operations.
+        Usage:
 
-    def get_session(self) -> Generator[Session]:
-        with self.session_factory() as session:
+            with db.session_factory(auto_commit=True, read_only=False) as session:
+                # use session here
+                pass
+
+        Args:
+            auto_commit (bool): If True, commit the transaction if no exceptions occur.
+            read_only (bool): If True, do not commit or rollback the transaction.
+        Yields:
+            Session: SQLAlchemy session object.
+        """
+        session = self.__session_factory()
+        try:
             yield session
+            if auto_commit and not read_only:
+                session.commit()
+        except Exception:
+            if not read_only:
+                session.rollback()
+            raise
+        finally:
+            session.close()
 
     def initialize_db_tables(self):
         BaseDBModel.metadata.create_all(bind=self.engine)
 
     def __del__(self):
         self.engine.dispose()
-
-
-db: DB | None = None
-
-
-def start_db(settings: Settings) -> DB:
-    global db
-    db = DB(settings)
-    return db

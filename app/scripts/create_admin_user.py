@@ -1,7 +1,6 @@
 from sqlalchemy.exc import MultipleResultsFound, NoResultFound
 
 from app.core.base_script import BaseScript
-from app.core.db import managed_db_context
 from app.domain.users.entities import UserCreateEntity, UserEntity
 from app.domain.users.services import UserService
 from app.infra.persistence.models.user import UserModel

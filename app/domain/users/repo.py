@@ -6,6 +6,8 @@ from app.domain.users.entities import UserCreateEntity, UserEntity
 
 
 class UserRepo(Protocol):
+    session: Session
+
     def __init__(self, session: Session):
         self.session = session
 

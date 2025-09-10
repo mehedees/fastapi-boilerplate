@@ -1,7 +1,8 @@
 from dependency_injector import containers, providers
 
+from app.api import v1 as api_v1
 from app.core.settings import Settings
-from app.infra.persistence.db import start_db
+from app.infra.persistence.db import Database
 
 # # from app.infra.persistence.r.user_repo_impl import UserRepositoryImpl
 
@@ -20,7 +21,7 @@ class Container(containers.DeclarativeContainer):
     config = providers.Configuration()
 
     # Infrastructure - Database
-    database = providers.Singleton(start_db, settings=config)
+    database = providers.Resource(Database, settings=config)
 
 
 #     # Repositories
@@ -55,13 +56,7 @@ def setup_container(settings: Settings) -> Container:
     container.config.from_pydantic(settings)
 
     # Wire modules for automatic injection
-    container.wire(
-        modules=[
-            # "api.v1.users.views",
-            # "api.v1.payments.views",
-            # Add more modules as needed
-        ]
-    )
+    container.wire(modules=[api_v1])
 
     return container
 
