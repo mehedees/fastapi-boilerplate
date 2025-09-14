@@ -1,3 +1,5 @@
+from typing import TypeVar
+
 from sqlalchemy import inspect
 from sqlalchemy.orm import DeclarativeBase
 
@@ -11,3 +13,6 @@ class BaseDBModel(DeclarativeBase):
             if c.key in field_names
         }
         return dataclass_cls(**data)
+
+
+DBModel = TypeVar("DBModel", bound=BaseDBModel)

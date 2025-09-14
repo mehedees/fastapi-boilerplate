@@ -1,10 +1,10 @@
 from dependency_injector import containers, providers
 
+from app import scripts
 from app.api import v1 as api_v1
 from app.core.settings import Settings
 from app.infra.persistence.db import Database
-
-# # from app.infra.persistence.r.user_repo_impl import UserRepositoryImpl
+from app.infra.persistence.repo_impl.user import UserRepoImpl
 
 # # from domain.payments.services import PaymentService
 # # from domain.users.services import UserService
@@ -23,28 +23,17 @@ class Container(containers.DeclarativeContainer):
     # Infrastructure - Database
     database = providers.Resource(Database, settings=config)
 
+    # Repositories
+    user_repository = providers.Factory(
+        UserRepoImpl,
+        session_factory=database.provided.session_factory,
+    )
 
-#     # Repositories
-#     user_repository = providers.Factory(
-#         UserRepositoryImpl,
-#         session_factory=database.provided.session_factory,
-#     )
-
-#     payment_repository = providers.Factory(
-#         PaymentRepositoryImpl,
-#         session_factory=database.provided.session_factory,
-#     )
-
-#     # Domain Services
-#     user_service = providers.Factory(
-#         UserService,
-#         user_repository=user_repository,
-#     )
-
-#     payment_service = providers.Factory(
-#         PaymentService,
-#         payment_repository=payment_repository,
-#     )
+    # Domain Services
+    user_service = providers.Factory(
+        UserService,
+        user_repository=user_repository,
+    )
 
 
 def setup_container(settings: Settings) -> Container:
@@ -56,7 +45,7 @@ def setup_container(settings: Settings) -> Container:
     container.config.from_pydantic(settings)
 
     # Wire modules for automatic injection
-    container.wire(modules=[api_v1])
+    container.wire(modules=[api_v1, scripts])
 
     return container
 

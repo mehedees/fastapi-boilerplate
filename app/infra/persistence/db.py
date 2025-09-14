@@ -1,4 +1,4 @@
-from collections.abc import Callable
+from collections.abc import Callable, Generator
 
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.orm import Session, scoped_session, sessionmaker
@@ -35,7 +35,9 @@ class Database:
             },
         )
 
-    def session_factory(self, auto_commit: bool = True, read_only: bool = False):
+    def session_factory(
+        self, auto_commit: bool = True, read_only: bool = False
+    ) -> Generator[Session]:
         """
         Provide a transactional scope around a series of operations.
         Usage:
