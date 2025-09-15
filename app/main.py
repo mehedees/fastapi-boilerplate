@@ -7,8 +7,6 @@ from app.core.logging import logger
 from app.core.schemas.base import APIResponse
 from app.core.settings import Settings, get_settings
 
-settings = get_settings()
-
 
 class FastAPIApp(FastAPI):
     container: Container

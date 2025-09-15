@@ -10,10 +10,8 @@ class UserRepoImpl(BaseRepoImpl):
     def __init__(self, **kwargs):
         super().__init__(model=UserModel, **kwargs)
 
-    def create_user(self, user: UserCreateEntity) -> UserEntity:
-        obj = self.__model(**asdict(user))
-        self.session.add(obj)
-        self.session.commit()
-        self.session.refresh(obj)
+    async def create_user(self, user: UserCreateEntity) -> UserEntity:
+        return await self.create(data=asdict(user), entity_type=UserEntity)
 
-        return obj.to_dataclass(UserEntity)
+    async def get_user_by_email(self, email: str) -> UserEntity:
+        pass
