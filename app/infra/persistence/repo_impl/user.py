@@ -26,5 +26,13 @@ class UserRepoImpl(BaseRepoImpl):
     async def get_user_by_email(self, email: str) -> UserEntity | None:
         with self.session_factory(read_only=True) as session:
             stmt = select(UserModel).filter_by(email=email)
-            result = session.execute(stmt).scalars().one_or_none()
-            return result.to_dataclass(UserEntity) if result else None
+            result = session.scalars(stmt).one_or_none()
+        return result.to_dataclass(UserEntity) if result else None
+
+    async def list_users(
+        self, limit: int | None, offset: int | None
+    ) -> tuple[UserEntity]:
+        with self.session_factory(read_only=True) as session:
+            stmt = select(UserModel).limit(limit).offset(offset)
+            result = session.scalars(stmt).all()
+        return tuple(result.to_dataclass(UserEntity) for result in result)

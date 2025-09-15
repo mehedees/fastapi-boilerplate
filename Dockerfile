@@ -5,7 +5,7 @@
 # First, build the application in the `/app` directory.
 
 # Build stage
-FROM ghcr.io/astral-sh/uv:0.8.13-python3.13-trixie-slim as builder
+FROM ghcr.io/astral-sh/uv:0.8.13-python3.13-trixie-slim AS builder
 
 # Set build-time environment variables
 ENV PYTHONUNBUFFERED=1 \
@@ -34,7 +34,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 
 # Then, use a final image without uv
-FROM python:3.13-slim-trixie as production
+FROM python:3.13-slim-trixie AS production
 
 # Add metadata labels
 LABEL maintainer="Mehedee Siddique <mehedees@live.com>" \

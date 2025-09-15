@@ -3,15 +3,9 @@ from dependency_injector import containers, providers
 from app import scripts
 from app.api import v1 as api_v1
 from app.core.settings import Settings
+from app.domain.users.services import UserService
 from app.infra.persistence.db import Database
 from app.infra.persistence.repo_impl.user import UserRepoImpl
-
-# # from domain.payments.services import PaymentService
-# # from domain.users.services import UserService
-
-# # from app.infra.persistence.repositories.payment_repo_impl import (
-# #     PaymentRepositoryImpl,
-# # )
 
 
 class Container(containers.DeclarativeContainer):
@@ -20,8 +14,10 @@ class Container(containers.DeclarativeContainer):
     # Configuration
     config = providers.Configuration()
 
+    settings = providers.Singleton(Settings)
+
     # Infrastructure - Database
-    database = providers.Resource(Database, settings=config)
+    database = providers.Resource(Database, settings=settings)
 
     # Repositories
     user_repository = providers.Factory(

@@ -5,7 +5,7 @@ from app.core.settings import get_settings
 class BaseScript:
     def __init__(self):
         print("Initializing Base Script")
-        self.conainer: Container | None = None
+        self.container: Container | None = None
 
     def __enter__(self):
         print("Entering Base Script")
