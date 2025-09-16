@@ -1,22 +1,20 @@
 import asyncio
 
-from dependency_injector.wiring import inject
+from dependency_injector.wiring import Provide, inject
 from pydantic import SecretStr
 
 from app.api.v1.users.schema import UserCreateSchema
-from app.core.base_script import BaseScript
+from app.core.container import Container, setup_container
+from app.core.settings import get_settings
 from app.domain.users.entities import UserCreateEntity, UserEntity
 from app.domain.users.services import UserService
+from app.scripts.base import BaseScript
 
 
 class CreateFirstUser(BaseScript):
-    @inject
-    async def create_first_user(
-        self,
-        # user_service: UserService = Provide[Container.user_service]
-    ):
-        user_service: UserService = self.container.user_service
+    async def create_first_user(self, user_service: UserService):
         # Check if there is a user in the database
+        print("in...")
         first_user: tuple[UserEntity] = await user_service.list_users(limit=1)
         if first_user:
             print("First user exists already")
@@ -49,10 +47,21 @@ class CreateFirstUser(BaseScript):
             return
 
 
-if __name__ == "__main__":
+@inject
+async def main(user_service: UserService = Provide[Container.user_service]):
     with CreateFirstUser() as script:
         try:
             print("Creating first user...")
-            asyncio.run(script.create_first_user())
+            await script.create_first_user(user_service)
         except Exception as e:
             print(e)
+
+
+if __name__ == "__main__":
+    settings = get_settings()
+    container: Container = setup_container(settings)
+    container.wire(modules=[__name__])
+    container.init_resources()
+    asyncio.run(main())
+    print("Shutting down...")
+    container.shutdown_resources()

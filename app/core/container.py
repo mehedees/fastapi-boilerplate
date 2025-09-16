@@ -3,6 +3,7 @@ from dependency_injector import containers, providers
 from app import scripts
 from app.api import v1 as api_v1
 from app.core.settings import Settings
+from app.core.utils.auth import SecureHashManager
 from app.domain.users.services import UserService
 from app.infra.persistence.db import Database
 from app.infra.persistence.repo_impl.user import UserRepoImpl
@@ -25,10 +26,16 @@ class Container(containers.DeclarativeContainer):
         session_factory=database.provided.session_factory,
     )
 
+    # hash manager
+    hash_manager = providers.Singleton(
+        SecureHashManager, secret_key=settings.provided.SECRET_KEY
+    )
+
     # Domain Services
     user_service = providers.Factory(
         UserService,
-        user_repository=user_repository,
+        repo=user_repository,
+        hash_manager=hash_manager,
     )
 
 

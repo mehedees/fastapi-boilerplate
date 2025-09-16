@@ -31,7 +31,7 @@ class Settings(BaseSettings):
     def database_url(self):
         return (
             f"mysql+pymysql://{self.DATABASE_USER}:{self.DATABASE_PASSWORD}"
-            f"@{self.DATABASE_HOST}:{self.DATABASE_PORT}/{self.DATABASE_NAME}"
+            f"@{self.DATABASE_HOST}:3306/{self.DATABASE_NAME}"
         )
 
     # CORS

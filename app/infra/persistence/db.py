@@ -1,4 +1,5 @@
 from collections.abc import Callable, Generator
+from contextlib import contextmanager
 
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.orm import Session, scoped_session, sessionmaker
@@ -19,6 +20,7 @@ class Database:
                 expire_on_commit=False,
             )
         )
+        self.initialize_db_tables()
 
     def __create_engine(self) -> Engine:
         return create_engine(
@@ -35,6 +37,7 @@ class Database:
             },
         )
 
+    @contextmanager
     def session_factory(
         self, auto_commit: bool = True, read_only: bool = False
     ) -> Generator[Session]:
@@ -53,6 +56,7 @@ class Database:
             Session: SQLAlchemy session object.
         """
         session = self.__session_factory()
+        print("type of session: ", type(session))
         try:
             yield session
             if auto_commit and not read_only:

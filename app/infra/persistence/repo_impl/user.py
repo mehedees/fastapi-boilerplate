@@ -31,7 +31,7 @@ class UserRepoImpl(BaseRepoImpl):
 
     async def list_users(
         self, limit: int | None, offset: int | None
-    ) -> tuple[UserEntity]:
+    ) -> tuple[UserEntity, ...]:
         with self.session_factory(read_only=True) as session:
             stmt = select(UserModel).limit(limit).offset(offset)
             result = session.scalars(stmt).all()
