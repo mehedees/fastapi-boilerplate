@@ -56,7 +56,6 @@ class Database:
             Session: SQLAlchemy session object.
         """
         session = self.__session_factory()
-        print("type of session: ", type(session))
         try:
             yield session
             if auto_commit and not read_only:

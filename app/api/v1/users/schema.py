@@ -22,7 +22,6 @@ def validate_password(value: SecretStr) -> SecretStr:
 
 
 def check_passwords_match(value: SecretStr, info: ValidationInfo) -> SecretStr:
-    print("info: ", info)
     password: SecretStr | None = info.data.get("password")
     if password is None:
         raise ValueError("Password must be set")

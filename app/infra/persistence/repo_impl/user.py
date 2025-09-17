@@ -10,11 +10,12 @@ from .base import BaseRepoImpl
 
 class UserRepoImpl(BaseRepoImpl):
     def __init__(self, **kwargs):
+        print("child")
         super().__init__(model=UserModel, **kwargs)
 
     async def create_user(self, user: UserCreateEntity) -> UserEntity:
         with self.session_factory() as session:
-            obj = self.__model(**asdict(user))
+            obj = UserModel(**asdict(user))
             session.add(obj)
             session.flush()
             print("after flush: ", obj)

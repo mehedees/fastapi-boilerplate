@@ -39,7 +39,11 @@ class CreateFirstUser(BaseScript):
 
         try:
             created_user = await user_service.create_user(
-                UserCreateEntity(**user_create_schema.model_dump())
+                UserCreateEntity(
+                    email=user_create_schema.email,
+                    name=user_create_schema.name,
+                    password=user_create_schema.password.get_secret_value(),
+                )
             )
             print(f"Created user {created_user.name}")
         except Exception as e:
