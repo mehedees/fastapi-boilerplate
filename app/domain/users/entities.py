@@ -7,7 +7,7 @@ class UserEntity:
     id: int
     email: str
     name: str
-    password: str
+    password: str  # TODO separate schema with password
 
     created_at: datetime
     updated_at: datetime
@@ -25,3 +25,9 @@ class UserUpdateEntity:
     email: str | None = None
     name: str | None = None
     password: str | None = None
+
+
+@dataclass
+class LoginRequestEntity:
+    email: str
+    password: str

@@ -5,6 +5,7 @@ from pydantic import (
     AfterValidator,
     BaseModel,
     BeforeValidator,
+    EmailStr,
     SecretStr,
     ValidationInfo,
 )
@@ -31,8 +32,13 @@ def check_passwords_match(value: SecretStr, info: ValidationInfo) -> SecretStr:
     return value
 
 
-class UserCreateSchema(BaseModel):
-    email: str
+class UserCreateRequest(BaseModel):
+    email: str  # TODO EmailStr
     name: str
     password: Annotated[SecretStr, BeforeValidator(validate_password)]
     confirm_password: Annotated[SecretStr, AfterValidator(check_passwords_match)]
+
+
+class UserLoginRequest(BaseModel):
+    email: EmailStr
+    password: SecretStr

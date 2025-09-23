@@ -3,7 +3,7 @@ import asyncio
 from dependency_injector.wiring import Provide, inject
 from pydantic import SecretStr
 
-from app.api.v1.users.schema import UserCreateSchema
+from app.api.v1.users.schema import UserCreateRequest
 from app.core.container import Container, setup_container
 from app.core.settings import get_settings
 from app.domain.users.entities import UserCreateEntity, UserEntity
@@ -27,7 +27,7 @@ class CreateFirstUser(BaseScript):
         confirm_password = SecretStr(input("Confirm Password: "))
 
         try:
-            user_create_schema = UserCreateSchema(
+            user_create_schema = UserCreateRequest(
                 email=email,
                 name=name,
                 password=password,
