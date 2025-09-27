@@ -16,7 +16,7 @@ class SecureHashManager:
         Args:
             secret_key: Application-wide secret key for additional security
         """
-        self.secret_key = secret_key
+        self.__secret_key = secret_key
 
     @property
     def argon2_password_hasher(self) -> PasswordHasher:
@@ -46,7 +46,7 @@ class SecureHashManager:
 
         # Apply HMAC with secret key
         peppered: str = SecureHashManager.make_hmac(
-            self.secret_key.encode("utf-8"),
+            self.__secret_key.encode("utf-8"),
             password_salt,
         )
 
