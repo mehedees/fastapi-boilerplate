@@ -2,7 +2,11 @@ from dataclasses import asdict
 
 from sqlalchemy import select
 
-from app.domain.users.entities import UserCreateEntity, UserEntity
+from app.domain.users.entities import (
+    UserCreateEntity,
+    UserCredentialsEntity,
+    UserEntity,
+)
 from app.infra.persistence.models.user import UserModel
 
 from .base import BaseRepoImpl
@@ -29,6 +33,12 @@ class UserRepoImpl(BaseRepoImpl):
             stmt = select(UserModel).filter_by(email=email)
             result = session.scalars(stmt).one_or_none()
         return result.to_dataclass(UserEntity) if result else None
+
+    async def get_user_creds_by_email(self, email: str) -> UserCredentialsEntity | None:
+        with self.session_factory(read_only=True) as session:
+            stmt = select(UserModel).filter_by(email=email)
+            result = session.scalars(stmt).one_or_none()
+        return result.to_dataclass(UserCredentialsEntity) if result else None
 
     async def list_users(
         self, limit: int | None, offset: int | None

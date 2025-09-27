@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.exception_handlers import http_exception_handler
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from app.api.v1.users.routes import user_router
 from app.core.container import Container, setup_container
 from app.core.logging import logger
 from app.core.settings import Settings, get_settings
@@ -26,6 +27,7 @@ def create_fastapi_app() -> FastAPIApp:
         exception_handlers={StarletteHTTPException: handle_api_exceptions},
     )
     app.container = container
+    register_routers(app)
     return app
 
 
@@ -40,3 +42,7 @@ async def app_lifespan(app: FastAPIApp):
 
 async def handle_api_exceptions(request, exc):
     return await http_exception_handler(request, exc)
+
+
+def register_routers(app: FastAPIApp):
+    app.include_router(user_router)

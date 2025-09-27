@@ -42,8 +42,10 @@ class Container(containers.DeclarativeContainer):
     # Domain Services
     user_service = providers.Factory(
         UserService,
+        settings=settings,
         repo=user_repository,
         hash_manager=hash_manager,
+        token_util=token_util,
     )
 
 

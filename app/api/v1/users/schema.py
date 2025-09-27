@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 from typing import Annotated
 
 from pydantic import (
@@ -42,3 +43,24 @@ class UserCreateRequest(BaseModel):
 class UserLoginRequest(BaseModel):
     email: EmailStr
     password: SecretStr
+
+
+class LoginToken(BaseModel):
+    access_token: str
+    access_token_iat: datetime
+    refresh_token: str
+    refresh_token_iat: datetime
+    token_type: str
+
+
+class UserProfile(BaseModel):
+    id: int
+    email: str
+    name: str
+    created_at: datetime
+    updated_at: datetime
+
+
+class UserLoginResponse(BaseModel):
+    tokens: LoginToken
+    user: UserProfile

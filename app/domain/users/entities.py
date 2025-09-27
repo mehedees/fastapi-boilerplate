@@ -7,7 +7,17 @@ class UserEntity:
     id: int
     email: str
     name: str
-    password: str  # TODO separate schema with password
+
+    created_at: datetime
+    updated_at: datetime
+
+
+@dataclass
+class UserCredentialsEntity:
+    id: int
+    email: str
+    name: str
+    password: str
 
     created_at: datetime
     updated_at: datetime
@@ -31,3 +41,18 @@ class UserUpdateEntity:
 class LoginRequestEntity:
     email: str
     password: str
+
+
+@dataclass
+class LoginTokenEntity:
+    access_token: str
+    access_token_iat: datetime
+    refresh_token: str
+    refresh_token_iat: datetime
+    token_type: str
+
+
+@dataclass
+class LoginResponseEntity:
+    tokens: LoginTokenEntity
+    user: UserEntity
