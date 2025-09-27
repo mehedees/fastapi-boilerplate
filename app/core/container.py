@@ -58,7 +58,7 @@ def setup_container(settings: Settings) -> Container:
     container.config.from_pydantic(settings)
 
     # Wire modules for automatic injection
-    container.wire(modules=[api_v1, scripts])
+    container.wire(packages=[api_v1, scripts])
 
     return container
 
