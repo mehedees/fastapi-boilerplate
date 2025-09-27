@@ -16,6 +16,9 @@ class Settings(BaseSettings):
 
     # Secret Key
     SECRET_KEY: str
+    ACCESS_TOKEN_EXPIRE_SECONDS: int
+    REFRESH_TOKEN_EXPIRE_SECONDS: int
+    AUTH_TOKEN_ALGORITHM: str = "HS256"
 
     # Database
     DATABASE_HOST: str

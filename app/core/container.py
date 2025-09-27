@@ -4,6 +4,7 @@ from app import scripts
 from app.api import v1 as api_v1
 from app.core.settings import Settings
 from app.core.utils.auth import SecureHashManager
+from app.core.utils.token import TokenUtils
 from app.domain.users.services import UserService
 from app.infra.persistence.db import Database
 from app.infra.persistence.repo_impl.user import UserRepoImpl
@@ -29,6 +30,13 @@ class Container(containers.DeclarativeContainer):
     # hash manager
     hash_manager = providers.Singleton(
         SecureHashManager, secret_key=settings.provided.SECRET_KEY
+    )
+
+    # token util
+    token_util = providers.Singleton(
+        TokenUtils,
+        secret_key=settings.provided.SECRET_KEY,
+        algorithm=settings.provided.AUTH_TOKEN_ALGORITHM,
     )
 
     # Domain Services
