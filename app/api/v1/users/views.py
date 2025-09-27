@@ -17,7 +17,7 @@ class UserViews:
     async def login(
         payload: UserLoginRequest,
         user_service: UserService = Depends(Provide[Container.user_service]),  # noqa: B008
-    ):
+    ) -> UserLoginResponse:
         try:
             login_response: LoginResponseEntity = await user_service.login(
                 login_req_payload=LoginRequestEntity(**payload.model_dump())

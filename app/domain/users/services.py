@@ -79,9 +79,11 @@ class UserService:
         return LoginResponseEntity(
             tokens=LoginTokenEntity(
                 access_token=access_token,
-                refresh_token=refresh_token,
                 access_token_iat=access_token_iat,
+                access_token_exp_seconds=self.__settings.ACCESS_TOKEN_EXPIRE_SECONDS,
+                refresh_token=refresh_token,
                 refresh_token_iat=refresh_token_iat,
+                refresh_token_exp_seconds=self.__settings.REFRESH_TOKEN_EXPIRE_SECONDS,
                 token_type="Bearer",
             ),
             user=UserEntity(

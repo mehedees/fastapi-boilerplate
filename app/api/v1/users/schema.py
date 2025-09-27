@@ -44,12 +44,17 @@ class UserLoginRequest(BaseModel):
     email: EmailStr
     password: SecretStr
 
+    def model_dump(self, *args, **kwargs):
+        return {"email": self.email, "password": self.password.get_secret_value()}
+
 
 class LoginToken(BaseModel):
     access_token: str
     access_token_iat: datetime
+    access_token_exp_seconds: int
     refresh_token: str
     refresh_token_iat: datetime
+    refresh_token_exp_seconds: int
     token_type: str
 
 

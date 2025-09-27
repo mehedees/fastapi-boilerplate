@@ -47,8 +47,10 @@ class LoginRequestEntity:
 class LoginTokenEntity:
     access_token: str
     access_token_iat: datetime
+    access_token_exp_seconds: int
     refresh_token: str
     refresh_token_iat: datetime
+    refresh_token_exp_seconds: int
     token_type: str
 
 
