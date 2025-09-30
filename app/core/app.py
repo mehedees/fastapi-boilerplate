@@ -1,6 +1,6 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import APIRouter, FastAPI
 from fastapi.exception_handlers import http_exception_handler
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
@@ -45,4 +45,7 @@ async def handle_api_exceptions(request, exc):
 
 
 def register_routers(app: FastAPIApp):
-    app.include_router(user_router)
+    api_v1_router = APIRouter(prefix="/api/v1")
+    api_v1_router.include_router(user_router)
+
+    app.include_router(api_v1_router)

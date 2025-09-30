@@ -1,5 +1,7 @@
 from fastapi import APIRouter
 
+from app.core.schemas.base import APIResponse
+
 from .schema import UserLoginResponse
 from .views import UserViews
 
@@ -13,13 +15,13 @@ user_router.add_api_route(
     endpoint=UserViews.login,
     methods=["POST"],
     name="login",
-    response_model=UserLoginResponse,
+    response_model=APIResponse[UserLoginResponse],
     summary="User login",
     description="User login endpoint",
     status_code=200,
     response_description="User login successful",
     responses={
-        200: {"description": "User login successful"},
+        200: {"description": "Login successful"},
         401: {"description": "Invalid login credentials"},
     },
 )
