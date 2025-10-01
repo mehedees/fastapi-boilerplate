@@ -18,7 +18,12 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "freezegun>=1.5.5",
+    "httpx>=0.28.1",
     "pre-commit>=4.3.0",
+    "pytest>=8.4.2",
+    "pytest-asyncio>=1.2.0",
+    "pytest-cov>=7.0.0",
     "ruff>=0.12.10",
 ]
 
@@ -46,3 +51,8 @@ known-first-party = ["app"]
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
+
+[tool.pytest.ini_options]
+addopts = "-q --cov=app --cov-report=term-missing"
+pythonpath = ["."]
+asyncio_mode = "auto"
