@@ -1,8 +1,16 @@
 from datetime import UTC, datetime, timedelta
+from enum import Enum
 
 import jwt
 
 TOKEN_EXPIRY_LEEWAY_SEC = 0
+
+
+class TokenTypeEnum(str, Enum):
+    """Token type enum"""
+
+    ACCESS = "access"
+    REFRESH = "refresh"
 
 
 class TokenUtils:
@@ -19,7 +27,7 @@ class TokenUtils:
         token_payload = {
             "iat": issued_at,
             "exp": expires_at,
-            "type": token_type,
+            "token_type": token_type,
             **payload,
         }
 
