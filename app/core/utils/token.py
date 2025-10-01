@@ -40,6 +40,6 @@ class TokenUtils:
             key=self.__secret_key,
             algorithms=[self.__algorithm],
             leeway=timedelta(seconds=TOKEN_EXPIRY_LEEWAY_SEC),
-            verify_exp=verify_expiry,
+            options={"verify_exp": verify_expiry},
         )
         return payload
