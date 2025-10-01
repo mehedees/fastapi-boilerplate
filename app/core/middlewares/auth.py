@@ -167,23 +167,16 @@ class AuthMiddleware(AuthenticationMiddleware):
         self,
         app,
         backend: JWTAuthBackend,
-        prefixes: list[str],
         exclude_paths: list[str],
     ):
         super().__init__(app, backend=backend)
         self.__exclude_paths = exclude_paths or []
-        self.__prefixes = prefixes or []
 
     async def __call__(self, scope, receive, send):
         """Process request (non-lifespan scope types) with path exclusion"""
 
         if scope["type"] != "lifespan":
             path = scope.get("path", "")
-            for prefix in self.__prefixes:
-                if path.startswith(prefix):
-                    path = path.removeprefix(prefix)
-                    break
-
             if path in self.__exclude_paths:
                 await self.app(scope, receive, send)
                 return

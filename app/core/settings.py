@@ -24,7 +24,7 @@ class Settings(BaseSettings):
         "/docs",
         "/openapi.json",
         HEALTHCHECK_ENDPOINT,
-        "/users/login",
+        "/api/v1/users/login",
     ]
 
     # Database

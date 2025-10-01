@@ -63,7 +63,6 @@ def register_middleware(app: FastAPIApp, settings: Settings):
             secret_key=settings.SECRET_KEY,
             algorithm=settings.AUTH_TOKEN_ALGORITHM,
         ),
-        prefixes=[settings.API_V1_PREFIX],
         exclude_paths=settings.AUTH_EXCLUDE_PATHS,
     )
     app.add_middleware(LoggingMiddleware)
