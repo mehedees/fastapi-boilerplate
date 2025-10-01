@@ -13,12 +13,19 @@ class Settings(BaseSettings):
     DEBUG: bool
     LOG_LEVEL: str
     API_V1_PREFIX: str = "/api/v1"
+    HEALTHCHECK_ENDPOINT: str = "/health"
 
     # Secret Key
     SECRET_KEY: str
     ACCESS_TOKEN_EXPIRE_SECONDS: int
     REFRESH_TOKEN_EXPIRE_SECONDS: int
     AUTH_TOKEN_ALGORITHM: str = "HS256"
+    AUTH_EXCLUDE_PATHS: list[str] = [
+        "/docs",
+        "/openapi.json",
+        HEALTHCHECK_ENDPOINT,
+        "/users/login",
+    ]
 
     # Database
     DATABASE_HOST: str
