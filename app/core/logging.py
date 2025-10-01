@@ -39,7 +39,7 @@ def configure_logger():
     logger.handlers = []
     logger.setLevel(getattr(logging, settings.LOG_LEVEL, logging.INFO))
     formatter = json.JsonFormatter(
-        fmt="%(asctime)s %(levelname)s %(name)s %(message)s %(extra)s",
+        fmt="%(asctime)s %(levelname)s %(name)s %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
     )
     console_handler = logging.StreamHandler()

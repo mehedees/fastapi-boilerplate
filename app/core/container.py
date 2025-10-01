@@ -21,12 +21,6 @@ class Container(containers.DeclarativeContainer):
     # Infrastructure - Database
     database = providers.Resource(Database, settings=settings)
 
-    # Repositories
-    user_repository = providers.Factory(
-        UserRepoImpl,
-        session_factory=database.provided.session_factory,
-    )
-
     # hash manager
     hash_manager = providers.Singleton(
         SecureHashManager, secret_key=settings.provided.SECRET_KEY
@@ -37,6 +31,12 @@ class Container(containers.DeclarativeContainer):
         TokenUtils,
         secret_key=settings.provided.SECRET_KEY,
         algorithm=settings.provided.AUTH_TOKEN_ALGORITHM,
+    )
+
+    # Repositories
+    user_repository = providers.Factory(
+        UserRepoImpl,
+        session_factory=database.provided.session_factory,
     )
 
     # Domain Services
