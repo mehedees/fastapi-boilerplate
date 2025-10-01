@@ -65,7 +65,10 @@ class UserService:
             raise InvalidPasswordException
 
         # generate token
-        token_payload = {"user_id": user_creds.id}
+        token_payload = {
+            "user_id": user_creds.id,
+            "email": user_creds.email,
+        }
         access_token, access_token_iat = self.__token_util.generate_token(
             token_payload,
             token_type="access",
@@ -94,3 +97,7 @@ class UserService:
                 updated_at=user_creds.updated_at,
             ),
         )
+
+    async def get_user_by_id(self, user_id: int) -> UserEntity:
+        user: UserEntity = await self.__repo.get_user_by_id(user_id)
+        return user
