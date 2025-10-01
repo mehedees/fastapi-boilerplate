@@ -16,7 +16,6 @@ from .base import BaseRepoImpl
 
 class UserRepoImpl(BaseRepoImpl):
     def __init__(self, **kwargs):
-        print("child")
         super().__init__(model=UserModel, **kwargs)
 
     async def create_user(self, user: UserCreateEntity) -> UserEntity:
@@ -24,9 +23,7 @@ class UserRepoImpl(BaseRepoImpl):
             obj = UserModel(**asdict(user))
             session.add(obj)
             session.flush()
-            print("after flush: ", obj)
             session.refresh(obj)
-            print("after refresh: ", obj)
 
         return obj.to_dataclass(UserEntity)
 

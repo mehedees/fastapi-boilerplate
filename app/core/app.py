@@ -37,6 +37,10 @@ def create_fastapi_app() -> FastAPIApp:
         debug=settings.DEBUG,
         lifespan=app_lifespan,
         exception_handlers={StarletteHTTPException: handle_api_exceptions},
+        responses={
+            401: {"description": "Not authenticated"},
+            404: {"description": "Not found"},
+        },
     )
     app.container = container
     register_middleware(app, settings)
