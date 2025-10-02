@@ -3,7 +3,6 @@ from app.core.utils.auth import SecureHashManager
 from app.core.utils.token import TokenUtils
 from app.domain.users.entities import (
     LoginRequestEntity,
-    LoginResponseEntity,
     LoginTokenEntity,
     UserCreateEntity,
     UserCredentialsEntity,
@@ -47,10 +46,10 @@ class UserService:
 
     async def list_users(
         self, limit: int | None = None, offset: int | None = None
-    ) -> tuple[UserEntity]:
+    ) -> tuple[UserEntity, ...]:
         return await self.__repo.list_users(limit, offset)
 
-    async def login(self, login_req_payload: LoginRequestEntity) -> LoginResponseEntity:
+    async def login(self, login_req_payload: LoginRequestEntity) -> LoginTokenEntity:
         # fetch user if exists
         user_creds: (
             UserCredentialsEntity | None
@@ -79,23 +78,14 @@ class UserService:
             token_type="refresh",
             expiry_sec=self.__settings.REFRESH_TOKEN_EXPIRE_SECONDS,
         )
-        return LoginResponseEntity(
-            tokens=LoginTokenEntity(
-                access_token=access_token,
-                access_token_iat=access_token_iat,
-                access_token_exp_seconds=self.__settings.ACCESS_TOKEN_EXPIRE_SECONDS,
-                refresh_token=refresh_token,
-                refresh_token_iat=refresh_token_iat,
-                refresh_token_exp_seconds=self.__settings.REFRESH_TOKEN_EXPIRE_SECONDS,
-                token_type="Bearer",
-            ),
-            user=UserEntity(
-                id=user_creds.id,
-                email=user_creds.email,
-                name=user_creds.name,
-                created_at=user_creds.created_at,
-                updated_at=user_creds.updated_at,
-            ),
+        return LoginTokenEntity(
+            access_token=access_token,
+            access_token_iat=access_token_iat,
+            access_token_exp_seconds=self.__settings.ACCESS_TOKEN_EXPIRE_SECONDS,
+            refresh_token=refresh_token,
+            refresh_token_iat=refresh_token_iat,
+            refresh_token_exp_seconds=self.__settings.REFRESH_TOKEN_EXPIRE_SECONDS,
+            token_type="Bearer",
         )
 
     async def get_user_by_id(self, user_id: int) -> UserEntity:

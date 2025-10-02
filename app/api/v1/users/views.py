@@ -2,14 +2,15 @@ from dataclasses import asdict
 
 from dependency_injector.wiring import Provide, inject
 from fastapi import Depends, Request, status
+from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 
-from app.api.v1.users.schema import UserLoginRequest, UserLoginResponse, UserProfile
+from app.api.v1.users.schema import LoginToken, UserProfile
 from app.core.container import Container
 from app.core.exceptions import APIException
 from app.core.schemas.base import APIResponse
 from app.domain.users.entities import (
     LoginRequestEntity,
-    LoginResponseEntity,
+    LoginTokenEntity,
     UserEntity,
 )
 from app.domain.users.exceptions import InvalidPasswordException, UserNotFoundException
@@ -20,17 +21,16 @@ class UserViews:
     @staticmethod
     @inject
     async def login(
-        payload: UserLoginRequest,
+        payload: OAuth2PasswordRequestForm = Depends(),  # noqa: B008
         user_service: UserService = Depends(Provide[Container.user_service]),  # noqa: B008
-    ) -> APIResponse[UserLoginResponse]:
+    ) -> LoginToken:
         try:
-            login_response: LoginResponseEntity = await user_service.login(
-                login_req_payload=LoginRequestEntity(**payload.model_dump())
+            login_tokens: LoginTokenEntity = await user_service.login(
+                login_req_payload=LoginRequestEntity(
+                    email=payload.username, password=payload.password
+                )
             )
-            return APIResponse(
-                message="Login successful",
-                data=UserLoginResponse(**asdict(login_response)),
-            )
+            return LoginToken(**asdict(login_tokens))
         except (UserNotFoundException, InvalidPasswordException):
             raise APIException(
                 status_code=status.HTTP_401_UNAUTHORIZED,

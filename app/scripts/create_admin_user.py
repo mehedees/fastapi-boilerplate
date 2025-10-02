@@ -15,7 +15,7 @@ class CreateFirstUser(BaseScript):
     async def create_first_user(self, user_service: UserService):
         # Check if there is a user in the database
         print("in...")
-        first_user: tuple[UserEntity] = await user_service.list_users(limit=1)
+        first_user: tuple[UserEntity, ...] = await user_service.list_users(limit=1)
         if first_user:
             print("First user exists already")
             return

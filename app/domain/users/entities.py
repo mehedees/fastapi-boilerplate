@@ -52,9 +52,3 @@ class LoginTokenEntity:
     refresh_token_iat: datetime
     refresh_token_exp_seconds: int
     token_type: str
-
-
-@dataclass
-class LoginResponseEntity:
-    tokens: LoginTokenEntity
-    user: UserEntity

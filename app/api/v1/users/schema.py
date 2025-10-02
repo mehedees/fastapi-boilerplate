@@ -6,7 +6,6 @@ from pydantic import (
     AfterValidator,
     BaseModel,
     BeforeValidator,
-    EmailStr,
     SecretStr,
     ValidationInfo,
 )
@@ -40,14 +39,6 @@ class UserCreateRequest(BaseModel):
     confirm_password: Annotated[SecretStr, AfterValidator(check_passwords_match)]
 
 
-class UserLoginRequest(BaseModel):
-    email: EmailStr
-    password: SecretStr
-
-    def model_dump(self, *args, **kwargs):
-        return {"email": self.email, "password": self.password.get_secret_value()}
-
-
 class LoginToken(BaseModel):
     access_token: str
     access_token_iat: datetime
@@ -64,8 +55,3 @@ class UserProfile(BaseModel):
     name: str
     created_at: datetime
     updated_at: datetime
-
-
-class UserLoginResponse(BaseModel):
-    tokens: LoginToken
-    user: UserProfile

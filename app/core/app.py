@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 
-from fastapi import APIRouter, FastAPI
+from fastapi import APIRouter, Depends, FastAPI
+from fastapi.security import OAuth2PasswordBearer
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.responses import JSONResponse
 
@@ -29,6 +30,9 @@ async def app_lifespan(app: FastAPIApp):
 def create_fastapi_app() -> FastAPIApp:
     settings: Settings = get_settings()
     container: Container = setup_container(settings)
+    oauth2_scheme = OAuth2PasswordBearer(
+        tokenUrl=settings.AUTH_LOGIN_PATH, auto_error=False
+    )
 
     app = FastAPIApp(
         title=settings.APP_NAME,
@@ -41,6 +45,7 @@ def create_fastapi_app() -> FastAPIApp:
             401: {"description": "Not authenticated"},
             404: {"description": "Not found"},
         },
+        dependencies=[Depends(oauth2_scheme)],
     )
     app.container = container
     register_middleware(app, settings)

@@ -2,7 +2,7 @@ from fastapi import APIRouter
 
 from app.core.schemas.base import APIResponse
 
-from .schema import UserLoginResponse, UserProfile
+from .schema import LoginToken, UserProfile
 from .views import UserViews
 
 user_router = APIRouter(
@@ -15,7 +15,7 @@ user_router.add_api_route(
     endpoint=UserViews.login,
     methods=["POST"],
     name="login",
-    response_model=APIResponse[UserLoginResponse],
+    response_model=LoginToken,
     summary="User login",
     description="User login endpoint",
     status_code=200,
