@@ -13,6 +13,7 @@ from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
+from app.core.schemas.base import APIResponse
 from app.core.utils.token import TokenTypeEnum, TokenUtils
 
 
@@ -187,11 +188,11 @@ class AuthMiddleware(AuthenticationMiddleware):
     @staticmethod
     def default_on_error(request: Request, exc: AuthError) -> JSONResponse:
         """Default error handler for authentication failures"""
-
-        error_message = str(exc)
-
         return JSONResponse(
-            {"error": exc.err_type.value, "message": error_message},
+            APIResponse(
+                success=False,
+                message=exc.detail,
+            ).model_dump(),
             status_code=401,
             headers={
                 "WWW-Authenticate": f'Bearer realm="api" error="{exc.err_type.value}" error_description="{exc.detail}"'

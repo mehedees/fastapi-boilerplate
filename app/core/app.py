@@ -50,6 +50,12 @@ def create_fastapi_app() -> FastAPIApp:
 
 async def handle_api_exceptions(request, exc):
     headers = getattr(exc, "headers", None)
+    if (
+        exc.status_code == 401
+        and isinstance(headers, dict)
+        and headers.get("WWW-Authenticate") is not None
+    ):
+        headers["WWW-Authenticate"] = "Bearer"
     return JSONResponse(
         APIResponse(
             success=False,
