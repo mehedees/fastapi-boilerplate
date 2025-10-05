@@ -26,7 +26,9 @@ class DummyTokenUtils:
 
 @pytest.mark.asyncio
 async def test_auth_backend_success(monkeypatch):
-    backend = JWTAuthBackend(secret_key="k", algorithm="HS256")
+    backend = JWTAuthBackend(
+        access_token_secret_key="k", refresh_token_secret_key="k", algorithm="HS256"
+    )
     # Patch private members for testability
     # TODO try without patching, using DI to provide tokenutil and httpbearer
     monkeypatch.setattr(backend, "_JWTAuthBackend__http_bearer", DummyHTTPBearer())
@@ -49,7 +51,9 @@ async def test_auth_backend_success(monkeypatch):
 
 @pytest.mark.asyncio
 async def test_auth_backend_expired_token(monkeypatch):
-    backend = JWTAuthBackend(secret_key="k", algorithm="HS256")
+    backend = JWTAuthBackend(
+        access_token_secret_key="k", refresh_token_secret_key="k", algorithm="HS256"
+    )
     monkeypatch.setattr(backend, "_JWTAuthBackend__http_bearer", DummyHTTPBearer())
     monkeypatch.setattr(
         backend,

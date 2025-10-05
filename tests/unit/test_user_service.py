@@ -2,7 +2,7 @@ from datetime import datetime
 
 import pytest
 
-from app.domain.users.entities import (
+from app.domain.users.entities.user_entities import (
     LoginRequestEntity,
     UserCreateEntity,
     UserCredentialsEntity,
@@ -97,8 +97,9 @@ async def test_login_success():
         email="a@b.com",
         name="A",
         password="hashed",
-        created_at=None,
-        updated_at=None,
+        is_active=True,
+        created_at=datetime.now(),
+        updated_at=datetime.now(),
     )
     service = UserService(
         FakeSettings(), FakeRepo(creds=creds), FakeHash(ok=True), FakeTokens()

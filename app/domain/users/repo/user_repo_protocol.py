@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from app.domain.users.entities import (
+from app.domain.users.entities.user_entities import (
     UserCreateEntity,
     UserCredentialsEntity,
     UserEntity,

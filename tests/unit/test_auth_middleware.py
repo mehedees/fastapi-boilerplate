@@ -17,7 +17,7 @@ async def test_excluded_path_skips_auth():
     app = PassThroughApp()
     am = AuthMiddleware(
         app,
-        backend=JWTAuthBackend("k", "HS256"),
+        backend=JWTAuthBackend("k", "k", "HS256"),
         exclude_paths=["/health", "/users/login"],
     )
 

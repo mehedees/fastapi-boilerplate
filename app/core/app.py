@@ -75,7 +75,8 @@ def register_middleware(app: FastAPIApp, settings: Settings):
     app.add_middleware(
         AuthMiddleware,
         backend=JWTAuthBackend(
-            secret_key=settings.SECRET_KEY,
+            access_token_secret_key=settings.ACCESS_TOKEN_SECRET_KEY,
+            refresh_token_secret_key=settings.REFRESH_TOKEN_SECRET_KEY,
             algorithm=settings.AUTH_TOKEN_ALGORITHM,
         ),
         exclude_paths=settings.AUTH_EXCLUDE_PATHS,

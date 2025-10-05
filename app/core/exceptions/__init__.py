@@ -6,4 +6,8 @@ class CustomException(Exception):
         self.message = message
 
 
-__all__ = ["APIException", "CustomException"]
+class NotFoundException(CustomException):
+    pass
+
+
+__all__ = ["APIException", "CustomException", "NotFoundException"]

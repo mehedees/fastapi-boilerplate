@@ -17,15 +17,20 @@ class Settings(BaseSettings):
 
     # Secret Key
     SECRET_KEY: str
+    ACCESS_TOKEN_SECRET_KEY: str
+    REFRESH_TOKEN_SECRET_KEY: str
     ACCESS_TOKEN_EXPIRE_SECONDS: int
     REFRESH_TOKEN_EXPIRE_SECONDS: int
     AUTH_TOKEN_ALGORITHM: str = "HS256"
     AUTH_LOGIN_PATH: str = f"{API_V1_PREFIX}/users/login"
+    AUTH_TOKEN_REFRESH_PATH: str = f"{API_V1_PREFIX}/users/refresh-token"
     AUTH_EXCLUDE_PATHS: list[str] = [
         "/docs",
+        "/redoc",
         "/openapi.json",
         HEALTHCHECK_ENDPOINT,
         AUTH_LOGIN_PATH,
+        AUTH_TOKEN_REFRESH_PATH,
     ]
 
     # Database
