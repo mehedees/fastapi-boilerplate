@@ -6,7 +6,7 @@ from pydantic import SecretStr
 from app.api.v1.users.schema import UserCreateRequest
 from app.core.container import Container, setup_container
 from app.core.settings import get_settings
-from app.domain.users.entities import UserCreateEntity, UserEntity
+from app.domain.users.entities.user_entities import UserCreateEntity, UserEntity
 from app.domain.users.services import UserService
 from app.scripts.base import BaseScript
 

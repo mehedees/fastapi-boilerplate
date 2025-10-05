@@ -5,9 +5,10 @@ from app.api import v1 as api_v1
 from app.core.settings import Settings
 from app.core.utils.auth import SecureHashManager
 from app.core.utils.token import TokenUtils
+from app.core.utils.user_agent import UserAgentUtil
 from app.domain.users.services import UserService
 from app.infra.persistence.db import Database
-from app.infra.persistence.repo_impl.user import UserRepoImpl
+from app.infra.persistence.repo_impl.user_repo_impl import UserRepoImpl
 
 
 class Container(containers.DeclarativeContainer):
@@ -29,8 +30,12 @@ class Container(containers.DeclarativeContainer):
     # token util
     token_util = providers.Singleton(
         TokenUtils,
-        secret_key=settings.provided.SECRET_KEY,
+        secret_key=settings.provided.ACCESS_TOKEN_SECRET_KEY,
         algorithm=settings.provided.AUTH_TOKEN_ALGORITHM,
+    )
+
+    user_agent_util = providers.Singleton(
+        UserAgentUtil,
     )
 
     # Repositories
@@ -46,6 +51,7 @@ class Container(containers.DeclarativeContainer):
         repo=user_repository,
         hash_manager=hash_manager,
         token_util=token_util,
+        user_agent_util=user_agent_util,
     )
 
 

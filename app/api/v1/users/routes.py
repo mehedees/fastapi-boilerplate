@@ -41,3 +41,19 @@ user_router.add_api_route(
         404: {"description": "User not found"},
     },
 )
+
+user_router.add_api_route(
+    "/refresh-token",
+    endpoint=UserViews.refresh_token,
+    methods=["POST"],
+    name="refresh_token",
+    response_model=LoginToken,
+    summary="User token refresh",
+    description="User token refresh endpoint",
+    status_code=200,
+    response_description="Refresh successful",
+    responses={
+        200: {"description": "Refresh successful"},
+        401: {"description": "Invalid refresh token"},
+    },
+)

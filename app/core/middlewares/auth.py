@@ -67,8 +67,17 @@ class AuthError(AuthenticationError):
 class JWTAuthBackend(AuthenticationBackend):
     """JWT Authentication Backend"""
 
-    def __init__(self, secret_key: str, algorithm: str):
-        self.__token_util = TokenUtils(secret_key=secret_key, algorithm=algorithm)
+    def __init__(
+        self,
+        access_token_secret_key: str,
+        refresh_token_secret_key: str,
+        algorithm: str,
+    ):
+        self.__token_util = TokenUtils(
+            access_token_secret_key=access_token_secret_key,
+            refresh_token_secret_key=refresh_token_secret_key,
+            algorithm=algorithm,
+        )
         self.__http_bearer = HTTPBearer()
 
     async def authenticate(
@@ -108,7 +117,7 @@ class JWTAuthBackend(AuthenticationBackend):
 
         try:
             # Decode JWT token
-            payload = self.__token_util.decode_token(token)
+            payload = self.__token_util.decode_access_token(token)
 
         except jwt.ExpiredSignatureError:
             raise AuthError(

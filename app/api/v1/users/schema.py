@@ -9,6 +9,7 @@ from pydantic import (
     SecretStr,
     ValidationInfo,
 )
+from pydantic_settings import SettingsConfigDict
 
 from app.domain.users.constants import PASSWORD_REGEX
 
@@ -43,10 +44,11 @@ class LoginToken(BaseModel):
     access_token: str
     access_token_iat: datetime
     access_token_exp_seconds: int
-    refresh_token: str
     refresh_token_iat: datetime
     refresh_token_exp_seconds: int
     token_type: str
+
+    model_config = SettingsConfigDict(extra="ignore")
 
 
 class UserProfile(BaseModel):

@@ -7,6 +7,7 @@ class UserEntity:
     id: int
     email: str
     name: str
+    is_active: bool
 
     created_at: datetime
     updated_at: datetime
@@ -17,6 +18,7 @@ class UserCredentialsEntity:
     id: int
     email: str
     name: str
+    is_active: bool
     password: str
 
     created_at: datetime
@@ -35,6 +37,7 @@ class UserUpdateEntity:
     email: str | None = None
     name: str | None = None
     password: str | None = None
+    is_active: bool | None = None
 
 
 @dataclass
