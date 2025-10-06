@@ -209,4 +209,4 @@ class AuthMiddleware(AuthenticationMiddleware):
         )
 
 
-__all__ = ["AuthMiddleware", "JWTAuthBackend", "AuthUser"]
+__all__ = ["AuthMiddleware", "JWTAuthBackend", "AuthUser", "AuthError", "AuthErrorType"]

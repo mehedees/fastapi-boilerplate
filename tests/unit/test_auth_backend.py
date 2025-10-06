@@ -18,7 +18,7 @@ class DummyTokenUtils:
     def __init__(self, payload_or_exc):
         self.payload_or_exc = payload_or_exc
 
-    def decode_token(self, token):
+    def decode_access_token(self, token):
         if isinstance(self.payload_or_exc, Exception):
             raise self.payload_or_exc
         return self.payload_or_exc
