@@ -8,6 +8,7 @@ from app.core.utils.token import TokenUtils
 from app.core.utils.user_agent import UserAgentUtil
 from app.domain.users.services import UserService
 from app.infra.persistence.db import Database
+from app.infra.persistence.repo_impl.refresh_token_repo_impl import RefreshTokenRepoImpl
 from app.infra.persistence.repo_impl.user_repo_impl import UserRepoImpl
 
 
@@ -30,7 +31,8 @@ class Container(containers.DeclarativeContainer):
     # token util
     token_util = providers.Singleton(
         TokenUtils,
-        secret_key=settings.provided.ACCESS_TOKEN_SECRET_KEY,
+        access_token_secret_key=settings.provided.ACCESS_TOKEN_SECRET_KEY,
+        refresh_token_secret_key=settings.provided.REFRESH_TOKEN_SECRET_KEY,
         algorithm=settings.provided.AUTH_TOKEN_ALGORITHM,
     )
 
@@ -44,11 +46,17 @@ class Container(containers.DeclarativeContainer):
         session_factory=database.provided.session_factory,
     )
 
+    refresh_token_repository = providers.Factory(
+        RefreshTokenRepoImpl,
+        session_factory=database.provided.session_factory,
+    )
+
     # Domain Services
     user_service = providers.Factory(
         UserService,
         settings=settings,
         repo=user_repository,
+        refresh_token_repo=refresh_token_repository,
         hash_manager=hash_manager,
         token_util=token_util,
         user_agent_util=user_agent_util,

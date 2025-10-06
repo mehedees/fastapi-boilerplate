@@ -20,7 +20,7 @@ class Database:
                 expire_on_commit=False,
             )
         )
-        self.initialize_db_tables()
+        # self.initialize_db_tables()
 
     def __create_engine(self) -> Engine:
         return create_engine(

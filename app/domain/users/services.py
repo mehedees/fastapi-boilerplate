@@ -92,7 +92,7 @@ class UserService:
             raise InvalidPasswordException
 
         # generate access token
-        access_token, access_token_iat = self.__make_access_token(
+        access_token, access_token_iat = await self.__make_access_token(
             user_id=user_creds.id,
             email=user_creds.email,
         )
@@ -132,11 +132,11 @@ class UserService:
         )
 
         # generate tokens
-        access_token, access_token_iat = self.__make_access_token(
+        access_token, access_token_iat = await self.__make_access_token(
             user_id=decoded_refresh_token.user_id,
             email=decoded_refresh_token.email,
         )
-        refresh_token, refresh_token_iat = self.__make_refresh_token(
+        refresh_token, refresh_token_iat = await self.__make_refresh_token(
             user_id=decoded_refresh_token.user_id,
             email=decoded_refresh_token.email,
             device_info_text=device_info_text,
