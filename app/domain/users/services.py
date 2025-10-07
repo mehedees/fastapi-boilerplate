@@ -136,7 +136,7 @@ class UserService:
             user_id=decoded_refresh_token.user_id,
             email=decoded_refresh_token.email,
         )
-        refresh_token, refresh_token_iat = await self.__make_refresh_token(
+        new_refresh_token, new_refresh_token_iat = await self.__make_refresh_token(
             user_id=decoded_refresh_token.user_id,
             email=decoded_refresh_token.email,
             device_info_text=device_info_text,
@@ -146,8 +146,8 @@ class UserService:
             access_token=access_token,
             access_token_iat=access_token_iat,
             access_token_exp_seconds=self.__settings.ACCESS_TOKEN_EXPIRE_SECONDS,
-            refresh_token=refresh_token,
-            refresh_token_iat=refresh_token_iat,
+            refresh_token=new_refresh_token,
+            refresh_token_iat=new_refresh_token_iat,
             refresh_token_exp_seconds=self.__settings.REFRESH_TOKEN_EXPIRE_SECONDS,
             token_type="Bearer",
         )

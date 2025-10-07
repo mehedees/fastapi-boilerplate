@@ -1,8 +1,8 @@
 def make_device_info_str(device_info: dict) -> str:
     device_info_str = ""
     for key, value in device_info.items():
-        device_info_str += f"{key}:{value}||"
-    return device_info_str[:-2] if device_info_str else device_info_str
+        device_info_str += f"{key}:{value}|"
+    return device_info_str[:-1] if device_info_str else device_info_str
 
 
 def parse_device_info(device_info_str: str) -> dict:

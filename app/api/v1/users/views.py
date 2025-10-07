@@ -44,14 +44,14 @@ class UserViews:
             )
 
             response.set_cookie(
-                key="refresh_token",
+                key=settings.REFRESH_TOKEN_COOKIE_NAME,
                 value=login_tokens.refresh_token,
                 httponly=True,
                 max_age=login_tokens.refresh_token_exp_seconds,
                 expires=login_tokens.refresh_token_exp_seconds,
                 samesite="strict",
                 secure=True if settings.ENVIRONMENT == EnvironmentEnum.PROD else False,
-                path="/api/v1/users/refresh-token",
+                path=settings.AUTH_TOKEN_REFRESH_PATH,
             )
             return LoginToken(**asdict(login_tokens))
         except (UserNotFoundException, InvalidPasswordException):
@@ -94,14 +94,14 @@ class UserViews:
                 refresh_token, user_agent
             )
             response.set_cookie(
-                key="refresh_token",
+                key=settings.REFRESH_TOKEN_COOKIE_NAME,
                 value=tokens.refresh_token,
                 httponly=True,
                 max_age=tokens.refresh_token_exp_seconds,
                 expires=tokens.refresh_token_exp_seconds,
                 samesite="strict",
                 secure=True if settings.ENVIRONMENT == EnvironmentEnum.PROD else False,
-                path="/api/v1/users/refresh-token",
+                path=settings.AUTH_TOKEN_REFRESH_PATH,
             )
             return LoginToken(**asdict(tokens))
         except InactiveUserException:
