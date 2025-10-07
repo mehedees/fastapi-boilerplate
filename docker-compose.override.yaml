@@ -1,0 +1,6 @@
+# docker-compose.override.yml (auto-loaded by compose)
+services:
+  app:
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "9000", "--workers", "1", "--reload", "--log-level", "info"]
+    volumes:
+      - ./app:/app/app
