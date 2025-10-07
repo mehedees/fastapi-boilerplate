@@ -152,6 +152,28 @@ class UserService:
             token_type="Bearer",
         )
 
+    async def logout(self, access_token: str, user_agent: str) -> None:
+        device_info: dict = self.__user_agent_util.parse_user_agent(user_agent)
+        device_info_text = make_device_info_str(safe_jsonable_encoder(device_info))
+
+        decoded_access_token_payload: dict = self.__token_util.decode_access_token(
+            access_token, verify_expiry=False
+        )
+
+        user_id: int = decoded_access_token_payload["user_id"]
+        deleted_tokens: int = (
+            await self.__refresh_token_repo.delete_refresh_token_by_user_id_device_info(
+                user_id, device_info_text
+            )
+        )
+        if deleted_tokens != 1:
+            logger.warning(
+                f"Found {deleted_tokens} refresh tokens for user {user_id} and device {device_info_text}. Revoke all tokens for user."
+            )
+            await self.__revoke_user_tokens(user_id)
+
+        return None
+
     async def __make_access_token(
         self, user_id: int, email: str
     ) -> tuple[str, datetime]:
