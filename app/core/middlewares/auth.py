@@ -87,7 +87,7 @@ class JWTAuthBackend(AuthenticationBackend):
 
         # Use FastAPI's HTTPBearer to extract token
         try:
-            credentials: HTTPAuthorizationCredentials | None = await self.__http_bearer(
+            credentials: HTTPAuthorizationCredentials = await self.__http_bearer(
                 request
             )
         except HTTPException as exc:
