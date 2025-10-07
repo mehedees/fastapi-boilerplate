@@ -57,3 +57,19 @@ user_router.add_api_route(
         401: {"description": "Invalid refresh token"},
     },
 )
+
+user_router.add_api_route(
+    "/logout",
+    endpoint=UserViews.logout,
+    methods=["POST"],
+    name="logout",
+    response_model=APIResponse,
+    summary="User logout",
+    description="User logout endpoint",
+    status_code=200,
+    response_description="Logout successful",
+    responses={
+        200: {"description": "Logout successful"},
+        401: {"description": "No/invalid token provided"},
+    },
+)

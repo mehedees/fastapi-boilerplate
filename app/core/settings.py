@@ -25,6 +25,7 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_COOKIE_NAME: str = "refresh_token"
     AUTH_LOGIN_PATH: str = f"{API_V1_PREFIX}/users/login"
     AUTH_TOKEN_REFRESH_PATH: str = f"{API_V1_PREFIX}/users/refresh-token"
+    AUTH_LOGOUT_PATH: str = f"{API_V1_PREFIX}/users/logout"
     AUTH_EXCLUDE_PATHS: list[str] = [
         "/docs",
         "/redoc",
@@ -32,6 +33,7 @@ class Settings(BaseSettings):
         HEALTHCHECK_ENDPOINT,
         AUTH_LOGIN_PATH,
         AUTH_TOKEN_REFRESH_PATH,
+        AUTH_LOGOUT_PATH,
     ]
 
     # Database

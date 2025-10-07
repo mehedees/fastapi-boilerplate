@@ -1,7 +1,8 @@
 from dataclasses import asdict
 
 from dependency_injector.wiring import Provide, inject
-from fastapi import Cookie, Depends, Request, Response, status
+from fastapi import Cookie, Depends, HTTPException, Request, Response, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 
 from app.api.v1.users.schema import LoginToken, UserProfile
@@ -114,3 +115,32 @@ class UserViews:
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid token",
             ) from None
+
+    @staticmethod
+    @inject
+    async def logout(
+        request: Request,
+        response: Response,
+        settings: Settings = Depends(Provide[Container.settings]),  # noqa: B008
+        user_service: UserService = Depends(Provide[Container.user_service]),  # noqa: B008
+    ):
+        user_agent: str = request.headers.get("user-agent", "unknown")
+
+        http_bearer = HTTPBearer()
+        try:
+            auth_creds: HTTPAuthorizationCredentials = await http_bearer(request)
+        except HTTPException:
+            raise APIException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="No/invalid token provided",
+            ) from None
+
+        await user_service.logout(auth_creds.credentials, user_agent)
+        response.delete_cookie(
+            key=settings.REFRESH_TOKEN_COOKIE_NAME,
+            path=settings.AUTH_TOKEN_REFRESH_PATH,
+            samesite="strict",
+            secure=True if settings.ENVIRONMENT == EnvironmentEnum.PROD else False,
+            httponly=True,
+        )
+        return APIResponse(message="Logout successful")
