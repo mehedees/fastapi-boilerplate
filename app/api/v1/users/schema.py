@@ -15,6 +15,21 @@ from app.domain.users.constants import PASSWORD_REGEX
 
 
 def validate_password(value: SecretStr) -> SecretStr:
+    """
+    Validates that the password meets the required complexity:
+    - At least one uppercase letter
+    - At least one lowercase letter
+    - At least one digit
+    - At least one special character
+    - Minimum length of 8 characters
+
+    Args:
+        value (SecretStr): The password to validate.
+    Returns:
+        SecretStr: The validated password.
+    Raises:
+        ValueError: If the password does not meet the complexity requirements.
+    """
     secret_value: str = value.get_secret_value()
     if not re.compile(PASSWORD_REGEX).match(secret_value):
         raise ValueError(
@@ -24,6 +39,17 @@ def validate_password(value: SecretStr) -> SecretStr:
 
 
 def check_passwords_match(value: SecretStr, info: ValidationInfo) -> SecretStr:
+    """
+    Validates that the password and confirm_password fields match.
+
+    Args:
+        value (SecretStr): The confirm_password value to validate.
+        info (ValidationInfo): Additional validation context.
+    Returns:
+        SecretStr: The validated confirm_password.
+    Raises:
+        ValueError: If the passwords do not match or if the password is not set.
+    """
     password: SecretStr | None = info.data.get("password")
     if password is None:
         raise ValueError("Password must be set")

@@ -9,6 +9,18 @@ from argon2.exceptions import VerifyMismatchError
 
 
 class SecureHashManager:
+    """
+    Manages secure password hashing and verification using multiple algorithms
+    with application-wide secret key (pepper) for added security.
+    Supported algorithms:
+    - Argon2id
+    - bcrypt
+    - PBKDF2 with SHA256
+    Each hash includes a unique salt and is stored in a format that allows
+    easy verification.
+    Uses HMAC with SHA256 to combine password and salt with a secret key (pepper)
+    before hashing, enhancing security against database breaches.
+    """
     def __init__(self, secret_key: str):
         """
         Initialize hash manager with secret key (pepper)
@@ -40,6 +52,11 @@ class SecureHashManager:
 
         This adds application-wide secret that attackers won't have
         even if they compromise the database
+
+        Args:
+            password: User's plaintext password
+            salt: Unique salt for this password
+        Returns: Hexadecimal HMAC string
         """
         # Combine password and salt
         password_salt = password.encode("utf-8") + salt
@@ -55,7 +72,13 @@ class SecureHashManager:
     def hash_password_argon2(self, password: str) -> str:
         """
         Hash password using Argon2id with pepper
+        1. Generate a random salt.
+        2. Apply HMAC with secret key (pepper) to combine password and salt.
+        3. Hash the peppered password with Argon2id.
+        4. Store the salt and hash together in a retrievable format.
 
+        Args:
+            password: User's plaintext password
         Returns: Base64 encoded string containing salt + hash
         """
         # Generate random salt
@@ -77,6 +100,14 @@ class SecureHashManager:
     def verify_password_argon2(self, password: str, stored_hash: str) -> bool:
         """
         Verify password against stored Argon2 hash
+        1. Extract salt and Argon2 hash from stored string.
+        2. Apply HMAC with secret key (pepper) to combine input password and salt.
+        3. Verify the peppered password against the Argon2 hash.
+
+        Args:
+            password: User's plaintext password to verify
+            stored_hash: Stored hash string containing salt + Argon2 hash
+        Returns: True if password matches, False otherwise
         """
         try:
             # Extract salt and hash
@@ -96,6 +127,12 @@ class SecureHashManager:
     def hash_password_bcrypt(self, password: str) -> str:
         """
         Hash password using bcrypt with pepper
+        1. Generate a random salt.
+        2. Apply HMAC with secret key (pepper) to combine password and salt.
+        3. Hash the peppered password with bcrypt.
+        4. Store the salt and hash together in a retrievable format.
+
+
 
         Returns: Base64 encoded string containing salt + hash
         """

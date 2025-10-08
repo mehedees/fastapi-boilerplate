@@ -65,7 +65,16 @@ class AuthError(AuthenticationError):
 
 
 class JWTAuthBackend(AuthenticationBackend):
-    """JWT Authentication Backend"""
+    """
+    JWT Authentication Backend
+    To be used with AuthenticationMiddleware in FastAPI/Starlette applications.
+
+    Uses HTTP Bearer tokens and validates JWT tokens for authentication.
+    1. Extracts token from Authorization header.
+    2. Decodes and validates the JWT token.
+    3. On success, returns AuthCredentials and AuthUser.
+    4. On failure, raises AuthError with appropriate details.
+    """
 
     def __init__(
         self,
@@ -83,7 +92,16 @@ class JWTAuthBackend(AuthenticationBackend):
     async def authenticate(
         self, request: Request
     ) -> tuple[AuthCredentials, BaseUser] | None:
-        """Authenticate request using JWT token"""
+        """
+        Authenticate request using JWT token
+
+        Args:
+            request (Request): The incoming HTTP request.
+        Returns:
+            tuple[AuthCredentials, BaseUser] | None: Auth credentials and user if authenticated, else None.
+        Raises:
+            AuthError: If authentication fails for various reasons.
+        """
 
         # Use FastAPI's HTTPBearer to extract token
         try:
@@ -171,7 +189,11 @@ class JWTAuthBackend(AuthenticationBackend):
 
 
 class AuthMiddleware(AuthenticationMiddleware):
-    """Custom JWT Authentication Middleware with path exclusions"""
+    """
+    Custom JWT Authentication Middleware with path exclusions
+    To be used in FastAPI/Starlette applications for JWT-based authentication with path exclusions.
+    Allows specifying paths to exclude from authentication checks.
+    """
 
     def __init__(
         self,

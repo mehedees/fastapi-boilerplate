@@ -9,6 +9,11 @@ from app.core.logging import logger, request_id_context
 
 
 class LoggingMiddleware(BaseHTTPMiddleware):
+    """
+    Middleware to log incoming requests and their responses.
+    Logs method, URL, status code, response time, and client IP address.
+    Also assigns a unique request ID to each request for better traceability.
+    """
     def __init__(self, app: ASGIApp):
         super().__init__(app)
 

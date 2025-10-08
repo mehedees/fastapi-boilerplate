@@ -26,6 +26,10 @@ from app.domain.users.services import UserService
 
 
 class UserViews:
+    """
+    A collection of static methods for handling user-related API endpoints.
+    """
+
     @staticmethod
     @inject
     async def login(
@@ -35,6 +39,22 @@ class UserViews:
         payload: OAuth2PasswordRequestForm = Depends(),  # noqa: B008
         user_service: UserService = Depends(Provide[Container.user_service]),  # noqa: B008
     ) -> LoginToken:
+        """
+        Handles user login.
+
+        Args:
+            request (Request): The HTTP request object.
+            response (Response): The HTTP response object.
+            settings (Settings): Application settings, injected via dependency.
+            payload (OAuth2PasswordRequestForm): Login credentials (username and password).
+            user_service (UserService): Service for user-related operations, injected via dependency.
+
+        Returns:
+            LoginToken: Access and refresh tokens for the authenticated user.
+
+        Raises:
+            APIException: If the login credentials are invalid.
+        """
         try:
             user_agent: str = request.headers.get("user-agent", "unknown")
             login_tokens: LoginTokenEntity = await user_service.login(
@@ -67,6 +87,19 @@ class UserViews:
         request: Request,
         user_service: UserService = Depends(Provide[Container.user_service]),  # noqa: B008
     ) -> APIResponse[UserProfile]:
+        """
+        Retrieves the profile of the currently authenticated user.
+
+        Args:
+            request (Request): The HTTP request object.
+            user_service (UserService): Service for user-related operations, injected via dependency.
+
+        Returns:
+            APIResponse[UserProfile]: The user's profile data.
+
+        Raises:
+            APIException: If the user is not found.
+        """
         auth_user = request.user
         try:
             user: UserEntity = await user_service.get_user_by_id(auth_user.user_id)
@@ -89,6 +122,22 @@ class UserViews:
         settings: Settings = Depends(Provide[Container.settings]),  # noqa: B008
         user_service: UserService = Depends(Provide[Container.user_service]),  # noqa: B008
     ):
+        """
+        Refreshes the user's authentication tokens.
+
+        Args:
+            request (Request): The HTTP request object.
+            response (Response): The HTTP response object.
+            refresh_token (str): The refresh token from the cookie.
+            settings (Settings): Application settings, injected via dependency.
+            user_service (UserService): Service for user-related operations, injected via dependency.
+
+        Returns:
+            LoginToken: New access and refresh tokens.
+
+        Raises:
+            APIException: If the user is inactive or the token is invalid.
+        """
         user_agent: str = request.headers.get("user-agent", "unknown")
         try:
             tokens: LoginTokenEntity = await user_service.refresh_token(
@@ -124,6 +173,21 @@ class UserViews:
         settings: Settings = Depends(Provide[Container.settings]),  # noqa: B008
         user_service: UserService = Depends(Provide[Container.user_service]),  # noqa: B008
     ):
+        """
+        Logs out the currently authenticated user.
+
+        Args:
+            request (Request): The HTTP request object.
+            response (Response): The HTTP response object.
+            settings (Settings): Application settings, injected via dependency.
+            user_service (UserService): Service for user-related operations, injected via dependency.
+
+        Returns:
+            APIResponse: A message indicating successful logout.
+
+        Raises:
+            APIException: If no or invalid token is provided.
+        """
         user_agent: str = request.headers.get("user-agent", "unknown")
 
         http_bearer = HTTPBearer()
