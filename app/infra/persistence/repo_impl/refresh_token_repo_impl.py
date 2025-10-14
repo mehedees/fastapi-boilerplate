@@ -2,6 +2,7 @@ from dataclasses import asdict
 
 from sqlalchemy import delete, select
 from sqlalchemy.exc import NoResultFound
+from sqlalchemy.orm import Session
 
 from app.core.exceptions import NotFoundException
 from app.domain.users.entities.refresh_token_entities import (
@@ -18,15 +19,22 @@ class RefreshTokenRepoImpl(BaseRepoImpl):
         super().__init__(model=RefreshTokenModel, **kwargs)
 
     async def create_refresh_token(
-        self, refresh_token: RefreshTokenCreateEntity
+        self,
+        refresh_token: RefreshTokenCreateEntity,
+        session: Session | None = None,
     ) -> RefreshTokenEntity:
-        with self.session_factory() as session:
-            obj = RefreshTokenModel(**asdict(refresh_token))
-            session.add(obj)
-            session.flush()
-            session.refresh(obj)
+        db_session = self._get_session(session)
+        should_close = session is None
 
-        return obj.to_dataclass(RefreshTokenEntity)
+        try:
+            obj = RefreshTokenModel(**asdict(refresh_token))
+            db_session.add(obj)
+            db_session.flush()
+            db_session.refresh(obj)
+            return obj.to_dataclass(RefreshTokenEntity)
+        finally:
+            if should_close:
+                db_session.close()
 
     async def get_refresh_token_by_id(
         self, refresh_token_id: int

@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from typing import Any
 
 import jwt
 
@@ -9,6 +10,7 @@ from app.core.utils.auth import SecureHashManager
 from app.core.utils.encoders import safe_jsonable_encoder
 from app.core.utils.token import TokenTypeEnum, TokenUtils
 from app.core.utils.user_agent import UserAgentUtil
+from app.domain.transactions.services import TransactionService
 from app.domain.users.entities.refresh_token_entities import (
     RefreshTokenCreateEntity,
     RefreshTokenEntity,
@@ -45,6 +47,7 @@ class UserService:
         hash_manager: SecureHashManager,
         token_util: TokenUtils,
         user_agent_util: UserAgentUtil,
+        transaction_service: TransactionService | None = None,
     ) -> None:
         self.__settings = settings
         self.__repo = repo
@@ -52,6 +55,7 @@ class UserService:
         self.__hash_manager = hash_manager
         self.__token_util = token_util
         self.__user_agent_util = user_agent_util
+        self.__transaction_service = transaction_service
 
     async def create_user(self, user: UserCreateEntity) -> UserEntity:
         # check if the user already exists
@@ -375,3 +379,193 @@ class UserService:
             raise InvalidCredentialsException from None
 
         return decoded_refresh_token
+
+    async def create_user_with_initial_tokens(
+        self, user: UserCreateEntity, user_agent: str
+    ) -> tuple[UserEntity, LoginTokenEntity]:
+        """
+        Example method demonstrating multi-operation transaction usage.
+
+        This method creates a user and immediately generates access/refresh tokens
+        within a single transaction. If any operation fails, the entire transaction
+        is rolled back.
+
+        This is a hypothetical scenario where you need to:
+        1. Create a user
+        2. Generate access token
+        3. Create refresh token in database
+        4. All operations must succeed or all must fail
+
+        Args:
+            user: User creation data
+            user_agent: User agent string for device tracking
+
+        Returns:
+            Tuple of (UserEntity, LoginTokenEntity)
+
+        Raises:
+            UserAlreadyExist: If user already exists
+            Various exceptions if any operation fails
+        """
+        if not self.__transaction_service:
+            raise ValueError(
+                "TransactionService is required for this operation"
+            )
+
+        # Check if user already exists (outside transaction for early validation)
+        existing_user: (
+            UserEntity | None
+        ) = await self.__repo.get_user_by_email(user.email)
+        if existing_user:
+            raise UserAlreadyExist("User already exists")
+
+        # Hash password
+        user.password = self.__hash_manager.hash_password_argon2(
+            user.password
+        )
+
+        # Perform all operations within a single transaction
+        with self.__transaction_service.transaction() as session:
+            # 1. Create user using repository
+            user_entity = await self.__repo.create_user(
+                user, session=session
+            )
+
+            # 2. Generate access token
+            (
+                access_token,
+                access_token_iat,
+            ) = await self.__make_access_token(
+                user_id=user_entity.id,
+                email=user_entity.email,
+            )
+
+            # 3. Parse device info
+            device_info = self.__user_agent_util.parse_user_agent(
+                user_agent
+            )
+            device_info_text = make_device_info_str(
+                safe_jsonable_encoder(device_info)
+            )
+
+            # 4. Create refresh token using repository
+            from app.domain.users.entities.refresh_token_entities import (
+                RefreshTokenCreateEntity,
+            )
+
+            refresh_token_entity = await self.__refresh_token_repo.create_refresh_token(
+                RefreshTokenCreateEntity(
+                    user_id=user_entity.id,
+                    device_info=device_info_text,
+                    expires_at=datetime.now()
+                    + timedelta(
+                        seconds=self.__settings.REFRESH_TOKEN_EXPIRE_SECONDS
+                        + 1
+                    ),
+                ),
+                session=session,
+            )
+
+            # 5. Generate refresh token JWT
+            refresh_token_payload = {
+                "user_id": user_entity.id,
+                "email": user_entity.email,
+                "refresh_token_id": refresh_token_entity.id,
+            }
+            refresh_token, refresh_token_iat = (
+                self.__token_util.generate_refresh_token(
+                    refresh_token_payload,
+                    expiry_sec=self.__settings.REFRESH_TOKEN_EXPIRE_SECONDS,
+                )
+            )
+
+            # 6. Create response entities
+            login_token_entity = LoginTokenEntity(
+                access_token=access_token,
+                access_token_iat=access_token_iat,
+                access_token_exp_seconds=self.__settings.ACCESS_TOKEN_EXPIRE_SECONDS,
+                refresh_token=refresh_token,
+                refresh_token_iat=refresh_token_iat,
+                refresh_token_exp_seconds=self.__settings.REFRESH_TOKEN_EXPIRE_SECONDS,
+                token_type="Bearer",
+            )
+
+            # All operations completed successfully - transaction will commit
+            return user_entity, login_token_entity
+
+    async def bulk_user_operations(
+        self, operations: list[dict[str, Any]]
+    ) -> list[Any]:
+        """
+        Example method for bulk operations within a single transaction.
+
+        This demonstrates how to handle multiple user-related operations
+        that need to be atomic (all succeed or all fail).
+
+        Args:
+            operations: List of operation dictionaries with 'type' and 'data' keys
+
+        Returns:
+            List of results from each operation
+
+        Raises:
+            Various exceptions if any operation fails
+        """
+        if not self.__transaction_service:
+            raise ValueError(
+                "TransactionService is required for this operation"
+            )
+
+        results = []
+
+        with self.__transaction_service.transaction() as session:
+            for operation in operations:
+                op_type = operation.get("type")
+                data = operation.get("data", {})
+
+                if op_type == "create_user":
+                    # Create user operation using repository
+                    from app.domain.users.entities.user_entities import (
+                        UserCreateEntity,
+                    )
+
+                    user_data = data.copy()
+                    user_data["password"] = (
+                        self.__hash_manager.hash_password_argon2(
+                            user_data["password"]
+                        )
+                    )
+
+                    user_entity = UserCreateEntity(**user_data)
+                    created_user = await self.__repo.create_user(
+                        user_entity, session=session
+                    )
+                    results.append(created_user)
+
+                elif op_type == "create_refresh_token":
+                    # Create refresh token operation using repository
+                    from app.domain.users.entities.refresh_token_entities import (
+                        RefreshTokenCreateEntity,
+                    )
+
+                    token_entity = RefreshTokenCreateEntity(**data)
+                    created_token = await self.__refresh_token_repo.create_refresh_token(
+                        token_entity, session=session
+                    )
+                    results.append(created_token)
+
+                elif op_type == "delete_user_tokens":
+                    # Delete all refresh tokens for a user using repository
+                    user_id = data.get("user_id")
+                    deleted_count = await self.__refresh_token_repo.delete_refresh_token_by_user_id(
+                        user_id
+                    )
+                    results.append({"deleted_count": deleted_count})
+
+                else:
+                    raise ValueError(
+                        f"Unknown operation type: {op_type}"
+                    )
+
+            # All operations completed successfully - transaction will commit
+            return results

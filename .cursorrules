@@ -1,0 +1,50 @@
+# Cursor Context Rules for FastAPI Boilerplate
+
+## What this project is
+- Production-ready FastAPI API using SQLAlchemy + MySQL
+- Layers: `api` (routers/views), `core` (app/settings/middlewares/utils), `domain` (services/entities/repo protocols), `infra` (DB models/repo impl), `scripts`, `tests`
+
+## Primary entrypoints
+- App factory: `app/core/app.py` → `create_fastapi_app()`
+- ASGI app: `app/main.py` (exports `app`)
+- Settings: `app/core/settings.py` (pydantic-settings + .env)
+- DI Container: `app/core/container.py` (dependency_injector)
+- Routers: `app/api/v1/users/routes.py` (included from `create_fastapi_app`)
+- Middlewares: `app/core/middlewares/auth.py`, `app/core/middlewares/logging.py`
+
+## Auth model
+- Bearer Access JWT required by default via `AuthMiddleware` + `JWTAuthBackend`
+- Excluded paths: read from `Settings`
+- Tokens generated/validated by `TokenUtils`; device-scoped refresh tokens stored in DB
+
+## Persistence
+- SQLAlchemy engine/session in `app/infra/persistence/db.py`
+- Models: `app/infra/persistence/models/`
+- Repos: `app/infra/persistence/repo_impl/`
+
+## Domain logic
+- `app/domain/users/services.py` drives login, refresh, logout, and user CRUD helpers
+
+## Run
+- Docker Compose: API + MySQL
+- Local (uv): `uv sync && uv run uvicorn app.main:app --reload --port 9000`
+- Health: `GET /health`
+- Docs: `/docs`, `/redoc`
+
+## Tests
+- Run: `uv run pytest`
+- API flow tests: `tests/api/test_users_flow.py`
+- Unit tests: `tests/unit/*`
+
+## Conventions
+- Use app factory pattern; keep code modular and dependency-injected
+- Follow `pydantic` models for request/response
+- Keep business logic in `domain` layer; DB logic in `infra`
+- Prefer explicit, typed function signatures; avoid `any`
+
+## Editing guidance for AI
+- Touch auth-sensitive code with care (token generation/validation, exclusions)
+- Do not hardcode secrets; read from `Settings`
+- Keep DB sessions via `Database.session_factory`
+- When adding endpoints, register in the appropriate router and include under `/api/v1`
+- Preserve existing indentation and formatting; avoid broad refactors in unrelated files

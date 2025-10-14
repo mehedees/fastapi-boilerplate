@@ -2,6 +2,7 @@ from dataclasses import asdict
 
 from sqlalchemy import select
 from sqlalchemy.exc import NoResultFound
+from sqlalchemy.orm import Session
 
 from app.domain.users.entities.user_entities import (
     UserCreateEntity,
@@ -18,20 +19,35 @@ class UserRepoImpl(BaseRepoImpl):
     def __init__(self, **kwargs):
         super().__init__(model=UserModel, **kwargs)
 
-    async def create_user(self, user: UserCreateEntity) -> UserEntity:
-        with self.session_factory() as session:
+    async def create_user(
+        self, user: UserCreateEntity, session: Session | None = None
+    ) -> UserEntity:
+        db_session = self._get_session(session)
+        should_close = session is None
+
+        try:
             obj = UserModel(**asdict(user))
-            session.add(obj)
-            session.flush()
-            session.refresh(obj)
+            db_session.add(obj)
+            db_session.flush()
+            db_session.refresh(obj)
+            return obj.to_dataclass(UserEntity)
+        finally:
+            if should_close:
+                db_session.close()
 
-        return obj.to_dataclass(UserEntity)
+    async def get_user_by_email(
+        self, email: str, session: Session | None = None
+    ) -> UserEntity | None:
+        db_session = self._get_session(session)
+        should_close = session is None
 
-    async def get_user_by_email(self, email: str) -> UserEntity | None:
-        with self.session_factory(read_only=True) as session:
+        try:
             stmt = select(UserModel).filter_by(email=email)
-            result = session.scalars(stmt).one_or_none()
-        return result.to_dataclass(UserEntity) if result else None
+            result = db_session.scalars(stmt).one_or_none()
+            return result.to_dataclass(UserEntity) if result else None
+        finally:
+            if should_close:
+                db_session.close()
 
     async def get_user_by_id(self, user_id: int) -> UserEntity:
         """

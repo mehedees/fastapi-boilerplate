@@ -1,5 +1,7 @@
 from typing import Protocol
 
+from sqlalchemy.orm import Session
+
 from app.domain.users.entities.refresh_token_entities import (
     RefreshTokenCreateEntity,
     RefreshTokenEntity,
@@ -8,7 +10,9 @@ from app.domain.users.entities.refresh_token_entities import (
 
 class RefreshTokenRepo(Protocol):
     async def create_refresh_token(
-        self, refresh_token: RefreshTokenCreateEntity
+        self,
+        refresh_token: RefreshTokenCreateEntity,
+        session: Session | None = None,
     ) -> RefreshTokenEntity: ...
     async def get_refresh_token_by_id(
         self, refresh_token_id: int

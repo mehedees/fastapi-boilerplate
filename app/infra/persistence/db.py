@@ -67,6 +67,33 @@ class Database:
         finally:
             session.close()
 
+    @contextmanager
+    def transaction(self) -> Generator[Session]:
+        """
+        Provide a manual transaction context for complex multi-operation scenarios.
+        This allows you to perform multiple interdependent operations within a single transaction.
+
+        Usage:
+            with db.transaction() as session:
+                # Perform multiple operations
+                user = session.add(UserModel(...))
+                session.flush()  # Get the ID
+                token = session.add(RefreshTokenModel(user_id=user.id, ...))
+                # All operations will be committed together or rolled back on exception
+
+        Yields:
+            Session: SQLAlchemy session object with manual transaction control.
+        """
+        session = self.__session_factory()
+        try:
+            yield session
+            session.commit()
+        except Exception:
+            session.rollback()
+            raise
+        finally:
+            session.close()
+
     def initialize_db_tables(self):
         BaseDBModel.metadata.create_all(bind=self.engine)
 

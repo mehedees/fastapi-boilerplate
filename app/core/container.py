@@ -6,6 +6,7 @@ from app.core.settings import Settings
 from app.core.utils.auth import SecureHashManager
 from app.core.utils.token import TokenUtils
 from app.core.utils.user_agent import UserAgentUtil
+from app.domain.transactions.services import TransactionService
 from app.domain.users.services import UserService
 from app.infra.persistence.db import Database
 from app.infra.persistence.repo_impl.refresh_token_repo_impl import (
@@ -53,6 +54,12 @@ class Container(containers.DeclarativeContainer):
         session_factory=database.provided.session_factory,
     )
 
+    # Transaction Service
+    transaction_service = providers.Factory(
+        TransactionService,
+        database=database,
+    )
+
     # Domain Services
     user_service = providers.Factory(
         UserService,
@@ -62,6 +69,7 @@ class Container(containers.DeclarativeContainer):
         hash_manager=hash_manager,
         token_util=token_util,
         user_agent_util=user_agent_util,
+        transaction_service=transaction_service,
     )
 
 
