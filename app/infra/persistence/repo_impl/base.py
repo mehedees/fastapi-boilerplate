@@ -6,6 +6,10 @@ from app.infra.persistence.models.base import DBModel
 
 
 class BaseRepoImpl:
-    def __init__(self, model: type[DBModel], session_factory: Callable[..., Session]):
+    def __init__(
+        self,
+        model: type[DBModel],
+        session_factory: Callable[..., Session],
+    ):
         self.__model = model
         self.session_factory = session_factory

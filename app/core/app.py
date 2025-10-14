@@ -40,7 +40,9 @@ def create_fastapi_app() -> FastAPIApp:
         version=settings.APP_VERSION,
         debug=settings.DEBUG,
         lifespan=app_lifespan,
-        exception_handlers={StarletteHTTPException: handle_api_exceptions},
+        exception_handlers={
+            StarletteHTTPException: handle_api_exceptions
+        },
         responses={
             401: {"description": "Not authenticated"},
             404: {"description": "Not found"},
@@ -91,7 +93,9 @@ def register_routers(app: FastAPIApp, settings: Settings):
     app.include_router(api_v1_router)
 
     app.add_api_route(
-        settings.HEALTHCHECK_ENDPOINT, endpoint=healthcheck, methods=["GET"]
+        settings.HEALTHCHECK_ENDPOINT,
+        endpoint=healthcheck,
+        methods=["GET"],
     )
 
 

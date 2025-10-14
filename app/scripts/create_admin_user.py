@@ -6,7 +6,10 @@ from pydantic import SecretStr
 from app.api.v1.users.schema import UserCreateRequest
 from app.core.container import Container, setup_container
 from app.core.settings import get_settings
-from app.domain.users.entities.user_entities import UserCreateEntity, UserEntity
+from app.domain.users.entities.user_entities import (
+    UserCreateEntity,
+    UserEntity,
+)
 from app.domain.users.services import UserService
 from app.scripts.base import BaseScript
 
@@ -15,7 +18,9 @@ class CreateFirstUser(BaseScript):
     async def create_first_user(self, user_service: UserService):
         # Check if there is a user in the database
         print("in...")
-        first_user: tuple[UserEntity, ...] = await user_service.list_users(limit=1)
+        first_user: tuple[
+            UserEntity, ...
+        ] = await user_service.list_users(limit=1)
         if first_user:
             print("First user exists already")
             return
@@ -52,7 +57,9 @@ class CreateFirstUser(BaseScript):
 
 
 @inject
-async def main(user_service: UserService = Provide[Container.user_service]):
+async def main(
+    user_service: UserService = Provide[Container.user_service],
+):
     with CreateFirstUser() as script:
         try:
             print("Creating first user...")

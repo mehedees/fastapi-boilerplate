@@ -3,7 +3,11 @@ import pytest
 from fastapi.security import HTTPAuthorizationCredentials
 from starlette.requests import Request
 
-from app.core.middlewares.auth import AuthError, AuthErrorType, JWTAuthBackend
+from app.core.middlewares.auth import (
+    AuthError,
+    AuthErrorType,
+    JWTAuthBackend,
+)
 
 
 class DummyHTTPBearer:
@@ -27,15 +31,21 @@ class DummyTokenUtils:
 @pytest.mark.asyncio
 async def test_auth_backend_success(monkeypatch):
     backend = JWTAuthBackend(
-        access_token_secret_key="k", refresh_token_secret_key="k", algorithm="HS256"
+        access_token_secret_key="k",
+        refresh_token_secret_key="k",
+        algorithm="HS256",
     )
     # Patch private members for testability
     # TODO try without patching, using DI to provide tokenutil and httpbearer
-    monkeypatch.setattr(backend, "_JWTAuthBackend__http_bearer", DummyHTTPBearer())
+    monkeypatch.setattr(
+        backend, "_JWTAuthBackend__http_bearer", DummyHTTPBearer()
+    )
     monkeypatch.setattr(
         backend,
         "_JWTAuthBackend__token_util",
-        DummyTokenUtils({"user_id": 1, "email": "a@b.com", "token_type": "access"}),
+        DummyTokenUtils(
+            {"user_id": 1, "email": "a@b.com", "token_type": "access"}
+        ),
     )
 
     scope = {"type": "http"}
@@ -52,9 +62,13 @@ async def test_auth_backend_success(monkeypatch):
 @pytest.mark.asyncio
 async def test_auth_backend_expired_token(monkeypatch):
     backend = JWTAuthBackend(
-        access_token_secret_key="k", refresh_token_secret_key="k", algorithm="HS256"
+        access_token_secret_key="k",
+        refresh_token_secret_key="k",
+        algorithm="HS256",
     )
-    monkeypatch.setattr(backend, "_JWTAuthBackend__http_bearer", DummyHTTPBearer())
+    monkeypatch.setattr(
+        backend, "_JWTAuthBackend__http_bearer", DummyHTTPBearer()
+    )
     monkeypatch.setattr(
         backend,
         "_JWTAuthBackend__token_util",

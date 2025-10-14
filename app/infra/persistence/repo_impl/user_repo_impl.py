@@ -48,11 +48,17 @@ class UserRepoImpl(BaseRepoImpl):
 
         return result.to_dataclass(UserEntity)
 
-    async def get_user_creds_by_email(self, email: str) -> UserCredentialsEntity | None:
+    async def get_user_creds_by_email(
+        self, email: str
+    ) -> UserCredentialsEntity | None:
         with self.session_factory(read_only=True) as session:
             stmt = select(UserModel).filter_by(email=email)
             result = session.scalars(stmt).one_or_none()
-        return result.to_dataclass(UserCredentialsEntity) if result else None
+        return (
+            result.to_dataclass(UserCredentialsEntity)
+            if result
+            else None
+        )
 
     async def list_users(
         self, limit: int | None, offset: int | None
@@ -60,4 +66,6 @@ class UserRepoImpl(BaseRepoImpl):
         with self.session_factory(read_only=True) as session:
             stmt = select(UserModel).limit(limit).offset(offset)
             result = session.scalars(stmt).all()
-        return tuple(result.to_dataclass(UserEntity) for result in result)
+        return tuple(
+            result.to_dataclass(UserEntity) for result in result
+        )

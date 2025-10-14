@@ -12,7 +12,9 @@ ALG = "HS256"
 @freeze_time("2025-01-01 00:00:00")
 def test_generate_and_decode_token_roundtrip():
     tu = TokenUtils(SECRET, SECRET, ALG)
-    token, iat = tu.generate_access_token({"user_id": 1, "email": "a@b.com"}, 3600)
+    token, iat = tu.generate_access_token(
+        {"user_id": 1, "email": "a@b.com"}, 3600
+    )
     assert isinstance(token, str)
     assert iat == datetime(2025, 1, 1, 0, 0, 0, tzinfo=UTC)
 

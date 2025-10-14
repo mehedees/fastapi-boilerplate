@@ -8,7 +8,9 @@ from app.core.utils.token import TokenUtils
 from app.core.utils.user_agent import UserAgentUtil
 from app.domain.users.services import UserService
 from app.infra.persistence.db import Database
-from app.infra.persistence.repo_impl.refresh_token_repo_impl import RefreshTokenRepoImpl
+from app.infra.persistence.repo_impl.refresh_token_repo_impl import (
+    RefreshTokenRepoImpl,
+)
 from app.infra.persistence.repo_impl.user_repo_impl import UserRepoImpl
 
 

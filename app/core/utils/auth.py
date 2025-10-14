@@ -21,6 +21,7 @@ class SecureHashManager:
     Uses HMAC with SHA256 to combine password and salt with a secret key (pepper)
     before hashing, enhancing security against database breaches.
     """
+
     def __init__(self, secret_key: str):
         """
         Initialize hash manager with secret key (pepper)
@@ -88,7 +89,9 @@ class SecureHashManager:
         peppered_password = self._apply_pepper(password, salt)
 
         # Hash with Argon2
-        hash_result = self.argon2_password_hasher.hash(peppered_password)
+        hash_result = self.argon2_password_hasher.hash(
+            peppered_password
+        )
 
         # Encode salt + hash for storage
         # Format: base64(salt) + "$" + argon2_hash
@@ -97,7 +100,9 @@ class SecureHashManager:
 
         return stored_hash
 
-    def verify_password_argon2(self, password: str, stored_hash: str) -> bool:
+    def verify_password_argon2(
+        self, password: str, stored_hash: str
+    ) -> bool:
         """
         Verify password against stored Argon2 hash
         1. Extract salt and Argon2 hash from stored string.
@@ -118,7 +123,9 @@ class SecureHashManager:
             peppered_password = self._apply_pepper(password, salt)
 
             # Verify with Argon2
-            self.argon2_password_hasher.verify(argon2_hash, peppered_password)
+            self.argon2_password_hasher.verify(
+                argon2_hash, peppered_password
+            )
             return True
 
         except (VerifyMismatchError, ValueError):
@@ -154,7 +161,9 @@ class SecureHashManager:
 
         return stored_hash
 
-    def verify_password_bcrypt(self, password: str, stored_hash: str) -> bool:
+    def verify_password_bcrypt(
+        self, password: str, stored_hash: str
+    ) -> bool:
         """
         Verify password against stored bcrypt hash
         """
@@ -168,12 +177,16 @@ class SecureHashManager:
             peppered_password = self._apply_pepper(password, salt)
 
             # Verify with bcrypt
-            return bcrypt.checkpw(peppered_password.encode("utf-8"), bcrypt_hash)
+            return bcrypt.checkpw(
+                peppered_password.encode("utf-8"), bcrypt_hash
+            )
 
         except (ValueError, TypeError):
             return False
 
-    def hash_password_pbkdf2(self, password: str, iterations: int = 100000) -> str:
+    def hash_password_pbkdf2(
+        self, password: str, iterations: int = 100000
+    ) -> str:
         """
         Hash password using PBKDF2 with pepper
 
@@ -204,14 +217,20 @@ class SecureHashManager:
 
         return stored_hash
 
-    def verify_password_pbkdf2(self, password: str, stored_hash: str) -> bool:
+    def verify_password_pbkdf2(
+        self, password: str, stored_hash: str
+    ) -> bool:
         """
         Verify password against stored PBKDF2 hash
         """
         try:
             # Extract components
             parts = stored_hash.split("$")
-            salt_b64, iterations_str, hash_b64 = parts[0], parts[1], parts[2]
+            salt_b64, iterations_str, hash_b64 = (
+                parts[0],
+                parts[1],
+                parts[2],
+            )
 
             salt = base64.b64decode(salt_b64)
             iterations = int(iterations_str)
@@ -222,7 +241,11 @@ class SecureHashManager:
 
             # Compute hash
             computed_hash = hashlib.pbkdf2_hmac(
-                "sha256", peppered_password.encode("utf-8"), salt, iterations, 64
+                "sha256",
+                peppered_password.encode("utf-8"),
+                salt,
+                iterations,
+                64,
             )
 
             # Constant-time comparison

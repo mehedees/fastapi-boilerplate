@@ -14,6 +14,7 @@ class LoggingMiddleware(BaseHTTPMiddleware):
     Logs method, URL, status code, response time, and client IP address.
     Also assigns a unique request ID to each request for better traceability.
     """
+
     def __init__(self, app: ASGIApp):
         super().__init__(app)
 
@@ -34,7 +35,9 @@ class LoggingMiddleware(BaseHTTPMiddleware):
             "url": str(request.url),
             "status_code": response.status_code,
             "response_time_ms": round(duration * 1000, 2),
-            "client_ip": request.client.host if request.client else "unknown",
+            "client_ip": request.client.host
+            if request.client
+            else "unknown",
         }
 
         logger.info("HTTP Request", extra=extra)

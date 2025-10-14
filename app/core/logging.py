@@ -9,12 +9,16 @@ from app.core.settings import get_settings
 settings = get_settings()
 
 # Context variable for request ID
-request_id_context: ContextVar[str] = ContextVar("request_id", default="no-request")
+request_id_context: ContextVar[str] = ContextVar(
+    "request_id", default="no-request"
+)
 
 
 # Custom logging adapter to inject request_id
 class RequestIdAdapter(logging.LoggerAdapter):
-    def process(self, msg: str, kwargs: dict[str, Any]) -> tuple[str, dict[str, Any]]:
+    def process(
+        self, msg: str, kwargs: dict[str, Any]
+    ) -> tuple[str, dict[str, Any]]:
         # Inject request_id into extra
         extra = kwargs.get("extra", {})
         extra["request_id"] = self.extra["request_id"]
@@ -48,7 +52,9 @@ def configure_logger():
     logger.addHandler(console_handler)
 
     # Wrap logger with adapter
-    return RequestIdAdapter(logger, {"request_id": request_id_context.get()})
+    return RequestIdAdapter(
+        logger, {"request_id": request_id_context.get()}
+    )
 
 
 # Initialize logger with adapter

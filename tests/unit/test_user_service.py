@@ -2,14 +2,19 @@ from datetime import datetime
 
 import pytest
 
-from app.domain.users.entities.refresh_token_entities import RefreshTokenEntity
+from app.domain.users.entities.refresh_token_entities import (
+    RefreshTokenEntity,
+)
 from app.domain.users.entities.user_entities import (
     LoginRequestEntity,
     UserCreateEntity,
     UserCredentialsEntity,
     UserEntity,
 )
-from app.domain.users.exceptions import InvalidPasswordException, UserNotFoundException
+from app.domain.users.exceptions import (
+    InvalidPasswordException,
+    UserNotFoundException,
+)
 from app.domain.users.services import UserService
 
 
@@ -33,7 +38,9 @@ class FakeRepo:
 
     async def get_user_by_id(self, user_id: int):
         if self._user is None:
-            from app.domain.users.exceptions import UserNotFoundException
+            from app.domain.users.exceptions import (
+                UserNotFoundException,
+            )
 
             raise UserNotFoundException
         return self._user
@@ -58,10 +65,10 @@ class FakeHash:
 
 class FakeTokens:
     def generate_access_token(self, payload, expiry_sec):
-        return f"access-token", 0
+        return "access-token", 0
 
     def generate_refresh_token(self, payload, expiry_sec):
-        return f"refresh-token", 0
+        return "refresh-token", 0
 
 
 class FakeSettings:
@@ -96,17 +103,27 @@ class FakeRefreshTokenRepo:
     async def delete_refresh_token_by_user_id(self, user_id: int):
         return 1
 
-    async def delete_refresh_token_by_user_id_device_info(self, user_id: int, device_info: str):
+    async def delete_refresh_token_by_user_id_device_info(
+        self, user_id: int, device_info: str
+    ):
         return 1
 
 
 @pytest.mark.asyncio
 async def test_login_user_not_found():
     service = UserService(
-        FakeSettings(), FakeRepo(creds=None), FakeRefreshTokenRepo(), FakeHash(), FakeTokens(), FakeUserAgentUtil()
+        FakeSettings(),
+        FakeRepo(creds=None),
+        FakeRefreshTokenRepo(),
+        FakeHash(),
+        FakeTokens(),
+        FakeUserAgentUtil(),
     )
     with pytest.raises(UserNotFoundException):
-        await service.login(LoginRequestEntity(email="a@b.com", password="x"), user_agent="x")
+        await service.login(
+            LoginRequestEntity(email="a@b.com", password="x"),
+            user_agent="x",
+        )
 
 
 @pytest.mark.asyncio
@@ -121,10 +138,18 @@ async def test_login_invalid_password():
         updated_at=datetime.now(),
     )
     service = UserService(
-        FakeSettings(), FakeRepo(creds=creds), FakeRefreshTokenRepo(), FakeHash(ok=False), FakeTokens(), FakeUserAgentUtil()
+        FakeSettings(),
+        FakeRepo(creds=creds),
+        FakeRefreshTokenRepo(),
+        FakeHash(ok=False),
+        FakeTokens(),
+        FakeUserAgentUtil(),
     )
     with pytest.raises(InvalidPasswordException):
-        await service.login(LoginRequestEntity(email="a@b.com", password="x"), user_agent="x")
+        await service.login(
+            LoginRequestEntity(email="a@b.com", password="x"),
+            user_agent="x",
+        )
 
 
 @pytest.mark.asyncio
@@ -139,7 +164,15 @@ async def test_login_success():
         updated_at=datetime.now(),
     )
     service = UserService(
-        FakeSettings(), FakeRepo(creds=creds), FakeRefreshTokenRepo(), FakeHash(ok=True), FakeTokens(), FakeUserAgentUtil()
+        FakeSettings(),
+        FakeRepo(creds=creds),
+        FakeRefreshTokenRepo(),
+        FakeHash(ok=True),
+        FakeTokens(),
+        FakeUserAgentUtil(),
     )
-    out = await service.login(LoginRequestEntity(email="a@b.com", password="x"), user_agent="x")
+    out = await service.login(
+        LoginRequestEntity(email="a@b.com", password="x"),
+        user_agent="x",
+    )
     assert out.access_token == "access-token"

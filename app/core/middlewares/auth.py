@@ -45,7 +45,9 @@ class AuthErrorType(str, Enum):
     """Enum for different authentication error types"""
 
     NOT_AUTHENTICATED = "not_authenticated"
-    INVALID_AUTHENTICATION_CREDENTIALS = "invalid_authentication_credentials"
+    INVALID_AUTHENTICATION_CREDENTIALS = (
+        "invalid_authentication_credentials"
+    )
     TOKEN_EXPIRED = "token_expired"
 
     INVALID_SIGNATURE = "invalid_signature"
@@ -57,7 +59,9 @@ class AuthErrorType(str, Enum):
 class AuthError(AuthenticationError):
     """Custom authentication error"""
 
-    def __init__(self, status_code: int, err_type: AuthErrorType, detail: str):
+    def __init__(
+        self, status_code: int, err_type: AuthErrorType, detail: str
+    ):
         self.status_code = status_code
         self.detail = detail
         self.err_type = err_type
@@ -105,11 +109,14 @@ class JWTAuthBackend(AuthenticationBackend):
 
         # Use FastAPI's HTTPBearer to extract token
         try:
-            credentials: HTTPAuthorizationCredentials = await self.__http_bearer(
-                request
+            credentials: HTTPAuthorizationCredentials = (
+                await self.__http_bearer(request)
             )
         except HTTPException as exc:
-            if exc.detail.lower().replace(" ", "_") == AuthErrorType.NOT_AUTHENTICATED:
+            if (
+                exc.detail.lower().replace(" ", "_")
+                == AuthErrorType.NOT_AUTHENTICATED
+            ):
                 raise AuthError(
                     status_code=exc.status_code,
                     err_type=AuthErrorType.NOT_AUTHENTICATED,
@@ -217,7 +224,9 @@ class AuthMiddleware(AuthenticationMiddleware):
         await super().__call__(scope, receive, send)
 
     @staticmethod
-    def default_on_error(request: Request, exc: AuthError) -> JSONResponse:
+    def default_on_error(
+        request: Request, exc: AuthError
+    ) -> JSONResponse:
         """Default error handler for authentication failures"""
         return JSONResponse(
             APIResponse(
@@ -231,4 +240,10 @@ class AuthMiddleware(AuthenticationMiddleware):
         )
 
 
-__all__ = ["AuthMiddleware", "JWTAuthBackend", "AuthUser", "AuthError", "AuthErrorType"]
+__all__ = [
+    "AuthMiddleware",
+    "JWTAuthBackend",
+    "AuthUser",
+    "AuthError",
+    "AuthErrorType",
+]

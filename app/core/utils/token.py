@@ -23,7 +23,11 @@ class TokenUtils:
         self.__algorithm = algorithm
 
     def __generate_token(
-        self, payload: dict, token_type: str, expiry_sec: int, secret_key: str
+        self,
+        payload: dict,
+        token_type: str,
+        expiry_sec: int,
+        secret_key: str,
     ) -> tuple[str, datetime]:
         """make jwt token with payload, expiry and token type. use secret key to sign"""
         issued_at = datetime.now(UTC)
@@ -34,10 +38,14 @@ class TokenUtils:
             "token_type": token_type,
             **payload,
         }
-        token = jwt.encode(token_payload, secret_key, algorithm=self.__algorithm)
+        token = jwt.encode(
+            token_payload, secret_key, algorithm=self.__algorithm
+        )
         return token, issued_at
 
-    def __decode_token(self, token: str, secret_key: str, verify_expiry: bool) -> dict:
+    def __decode_token(
+        self, token: str, secret_key: str, verify_expiry: bool
+    ) -> dict:
         payload = jwt.decode(
             token,
             key=secret_key,
@@ -67,10 +75,16 @@ class TokenUtils:
             self.__refresh_token_secret_key,
         )
 
-    def decode_access_token(self, token: str, verify_expiry: bool = True) -> dict:
-        return self.__decode_token(token, self.__access_token_secret_key, verify_expiry)
+    def decode_access_token(
+        self, token: str, verify_expiry: bool = True
+    ) -> dict:
+        return self.__decode_token(
+            token, self.__access_token_secret_key, verify_expiry
+        )
 
-    def decode_refresh_token(self, token: str, verify_expiry: bool = True) -> dict:
+    def decode_refresh_token(
+        self, token: str, verify_expiry: bool = True
+    ) -> dict:
         return self.__decode_token(
             token, self.__refresh_token_secret_key, verify_expiry
         )

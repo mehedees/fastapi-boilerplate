@@ -1,7 +1,14 @@
 from dataclasses import asdict
 
 from dependency_injector.wiring import Provide, inject
-from fastapi import Cookie, Depends, HTTPException, Request, Response, status
+from fastapi import (
+    Cookie,
+    Depends,
+    HTTPException,
+    Request,
+    Response,
+    status,
+)
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 
@@ -37,7 +44,9 @@ class UserViews:
         response: Response,
         settings: Settings = Depends(Provide[Container.settings]),  # noqa: B008
         payload: OAuth2PasswordRequestForm = Depends(),  # noqa: B008
-        user_service: UserService = Depends(Provide[Container.user_service]),  # noqa: B008
+        user_service: UserService = Depends(
+            Provide[Container.user_service]
+        ),  # noqa: B008
     ) -> LoginToken:
         """
         Handles user login.
@@ -56,7 +65,9 @@ class UserViews:
             APIException: If the login credentials are invalid.
         """
         try:
-            user_agent: str = request.headers.get("user-agent", "unknown")
+            user_agent: str = request.headers.get(
+                "user-agent", "unknown"
+            )
             login_tokens: LoginTokenEntity = await user_service.login(
                 login_req_payload=LoginRequestEntity(
                     email=payload.username, password=payload.password
@@ -71,7 +82,9 @@ class UserViews:
                 max_age=login_tokens.refresh_token_exp_seconds,
                 expires=login_tokens.refresh_token_exp_seconds,
                 samesite="strict",
-                secure=True if settings.ENVIRONMENT == EnvironmentEnum.PROD else False,
+                secure=True
+                if settings.ENVIRONMENT == EnvironmentEnum.PROD
+                else False,
                 path=settings.AUTH_TOKEN_REFRESH_PATH,
             )
             return LoginToken(**asdict(login_tokens))
@@ -85,7 +98,9 @@ class UserViews:
     @inject
     async def me(
         request: Request,
-        user_service: UserService = Depends(Provide[Container.user_service]),  # noqa: B008
+        user_service: UserService = Depends(
+            Provide[Container.user_service]
+        ),  # noqa: B008
     ) -> APIResponse[UserProfile]:
         """
         Retrieves the profile of the currently authenticated user.
@@ -102,7 +117,9 @@ class UserViews:
         """
         auth_user = request.user
         try:
-            user: UserEntity = await user_service.get_user_by_id(auth_user.user_id)
+            user: UserEntity = await user_service.get_user_by_id(
+                auth_user.user_id
+            )
             return APIResponse(
                 message="User profile retrieved",
                 data=UserProfile(**asdict(user)),
@@ -120,7 +137,9 @@ class UserViews:
         response: Response,
         refresh_token: str = Cookie(),
         settings: Settings = Depends(Provide[Container.settings]),  # noqa: B008
-        user_service: UserService = Depends(Provide[Container.user_service]),  # noqa: B008
+        user_service: UserService = Depends(
+            Provide[Container.user_service]
+        ),  # noqa: B008
     ):
         """
         Refreshes the user's authentication tokens.
@@ -150,7 +169,9 @@ class UserViews:
                 max_age=tokens.refresh_token_exp_seconds,
                 expires=tokens.refresh_token_exp_seconds,
                 samesite="strict",
-                secure=True if settings.ENVIRONMENT == EnvironmentEnum.PROD else False,
+                secure=True
+                if settings.ENVIRONMENT == EnvironmentEnum.PROD
+                else False,
                 path=settings.AUTH_TOKEN_REFRESH_PATH,
             )
             return LoginToken(**asdict(tokens))
@@ -171,7 +192,9 @@ class UserViews:
         request: Request,
         response: Response,
         settings: Settings = Depends(Provide[Container.settings]),  # noqa: B008
-        user_service: UserService = Depends(Provide[Container.user_service]),  # noqa: B008
+        user_service: UserService = Depends(
+            Provide[Container.user_service]
+        ),  # noqa: B008
     ):
         """
         Logs out the currently authenticated user.
@@ -192,7 +215,9 @@ class UserViews:
 
         http_bearer = HTTPBearer()
         try:
-            auth_creds: HTTPAuthorizationCredentials = await http_bearer(request)
+            auth_creds: HTTPAuthorizationCredentials = (
+                await http_bearer(request)
+            )
         except HTTPException:
             raise APIException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -204,7 +229,9 @@ class UserViews:
             key=settings.REFRESH_TOKEN_COOKIE_NAME,
             path=settings.AUTH_TOKEN_REFRESH_PATH,
             samesite="strict",
-            secure=True if settings.ENVIRONMENT == EnvironmentEnum.PROD else False,
+            secure=True
+            if settings.ENVIRONMENT == EnvironmentEnum.PROD
+            else False,
             httponly=True,
         )
         return APIResponse(message="Logout successful")

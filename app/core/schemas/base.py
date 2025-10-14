@@ -13,6 +13,7 @@ class APIResponse(BaseModel, Generic[T]):
         message (str | None): Optional message providing additional information about the response.
         data (T | None): The actual data returned by the API, of generic type T.
     """
+
     success: bool = True
     message: str | None = None
     data: T | None = None

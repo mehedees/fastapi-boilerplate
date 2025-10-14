@@ -38,7 +38,9 @@ def validate_password(value: SecretStr) -> SecretStr:
     return value
 
 
-def check_passwords_match(value: SecretStr, info: ValidationInfo) -> SecretStr:
+def check_passwords_match(
+    value: SecretStr, info: ValidationInfo
+) -> SecretStr:
     """
     Validates that the password and confirm_password fields match.
 
@@ -63,7 +65,9 @@ class UserCreateRequest(BaseModel):
     email: str  # TODO EmailStr
     name: str
     password: Annotated[SecretStr, BeforeValidator(validate_password)]
-    confirm_password: Annotated[SecretStr, AfterValidator(check_passwords_match)]
+    confirm_password: Annotated[
+        SecretStr, AfterValidator(check_passwords_match)
+    ]
 
 
 class LoginToken(BaseModel):
